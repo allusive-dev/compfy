@@ -1,5 +1,5 @@
 # picom
-A Fork of Pijulius picom published by Allusive
+A Fork of Pijulius picom published by Allusive.
 
 ## What it adds
 Makes the animations way smoother and more customizable.
@@ -7,7 +7,7 @@ Makes the animations way smoother and more customizable.
 
 ## Installation
 
-# Arch Linux
+### Arch Linux
 ```
 paru -S picom-allusive
 ```
