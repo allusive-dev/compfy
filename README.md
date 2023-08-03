@@ -7,11 +7,17 @@ Makes the animations way smoother and more customizable than the base picom pack
 
 ## Installation
 
-### Arch Linux
+### Arch Linux or other Arch based distros
 ```
 paru -S picom-allusive
 ```
 or
 ```
 yay -S picom-allusive
+```
+
+For those on Crystal Linux
+
+```
+ame -S picom-allusive
 ```
