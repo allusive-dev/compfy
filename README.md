@@ -7,6 +7,12 @@ Makes the animations way smoother and more customizable than the base picom pack
 
 ## Installation
 
+### Building Manually
+```
+$ meson --buildtype=release . build
+$ ninja -C build
+```
+
 ### Arch Linux or other Arch based distros
 ```
 paru -S picom-allusive
