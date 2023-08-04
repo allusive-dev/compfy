@@ -11,6 +11,7 @@ Makes the animations way smoother and more customizable than the base picom pack
 ```
 $ meson --buildtype=release . build
 $ ninja -C build
+$ ninja -C build install
 ```
 
 ### Arch Linux or other Arch based distros
