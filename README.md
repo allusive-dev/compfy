@@ -4,7 +4,7 @@ A Fork of Pijulius picom published by Allusive.
 ## What it adds
 Makes the animations way smoother and more customizable than the base picom package.
 
-#### No Changes have been made to this package from pijulius picom package as of yet.
+#### No Changes have been made to this package from pijulius's picom as of yet.
 
 
 ## Installation
