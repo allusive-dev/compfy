@@ -1,7 +1,7 @@
 # picom
 A Fork of Pijulius picom published by Allusive.
 
-### Have An Issue? Open One and I will try to help
+### Have An Issue? Open one and I will try to help
 
 ## What it adds
 Makes the animations way smoother and more customizable than the base picom package.
