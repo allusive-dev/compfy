@@ -58,7 +58,6 @@ endforeach
 test_h_dep = subproject('test.h').get_variable('test_h_dep')
 
 subdir('src')
-subdir('man')
 
 install_data('bin/picom-trans', install_dir: get_option('bindir'))
 install_data('picom.desktop', install_dir: 'share/applications')
