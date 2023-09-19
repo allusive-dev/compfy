@@ -9,12 +9,7 @@ WE NOW HAVE A WIKI!
 ## What it adds
 Makes the animations way smoother and more customizable than the base picom package.
 
-
-#### No Changes have been made to this package from pijulius's picom as of yet.
-
 Context: For unknown reason `picom-pijulius-git` was taken off the AUR. 
-This repository is here to keep this package up-to-date and on the AUR.
-
 
 ## Guides
 
@@ -28,7 +23,7 @@ $ man picom
 
 ### Building Manually
 ```
-$ meson --buildtype=release . build
+$ meson setup --buildtype=release . build
 $ ninja -C build
 $ ninja -C build install
 ```
