@@ -12,7 +12,7 @@ Makes the animations way smoother and more customizable than the base picom pack
 
 #### No Changes have been made to this package from pijulius's picom as of yet.
 
-For context: For unknown reason `picom-pijulius-git` was taken off the AUR. 
+Context: For unknown reason `picom-pijulius-git` was taken off the AUR. 
 This repository is here to keep this package up-to-date and on the AUR.
 
 ## Installation
