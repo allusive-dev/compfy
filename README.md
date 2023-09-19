@@ -16,6 +16,8 @@ This is a fork of picom-pijulius which is avaliable on the AUR. This repository/
 
 ```
 $ man picom
+
+// Above command only works if the package is installed.
 ```
 
 ## Installation
