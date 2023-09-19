@@ -4,16 +4,7 @@ project('picom', 'c', version: '8',
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v'+meson.project_version()
-
-# use git describe if that's available
-git = find_program('git', required: false)
-if git.found()
-	gitv = run_command('git', 'rev-parse', '--short=5', 'HEAD')
-	if gitv.returncode() == 0
-		version = 'vgit-'+gitv.stdout().strip()
-	endif
-endif
+version = 'v0.2-1'
 
 add_global_arguments('-DCOMPTON_VERSION="'+version+'"', language: 'c')
 

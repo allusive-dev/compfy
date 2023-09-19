@@ -26,8 +26,8 @@
 static void usage(const char *argv0, int ret) {
 #define WARNING_DISABLED " (DISABLED AT COMPILE TIME)"
 	static const char *usage_text =
-	    "picom (" COMPTON_VERSION ")\n"
-	    "Please report bugs to https://github.com/yshui/picom\n\n"
+	    "picom-allusive (" COMPTON_VERSION ")\n"
+	    "Please report bugs to https://github.com/allusive-dev/picom-allusive\n\n"
 	    "usage: %s [options]\n"
 	    "Options:\n"
 	    "\n"
