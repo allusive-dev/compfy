@@ -15,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-picom is a compositor based on Dana Jansens' version of xcompmgr (which itself was written by Keith Packard). It includes some improvements over the original xcompmgr, like window frame opacity and inactive window transparency.
+picom is a compositor for X11 which gives features to WM and DE such as opacity, blurring, rounded edges, shadows and most importantly. Animations!
 
 OPTIONS
 -------
@@ -502,14 +502,12 @@ $ picom --backend glx --vsync
 
 BUGS
 ----
-Please submit bug reports to <https://github.com/yshui/picom>.
+Please submit bug reports to <https://github.com/allusive-dev/picom-allusive>.
 
-Out dated information in this man page is considered a bug.
+Out dated information in this man page is NOT considered a bug.
 
 RESOURCES
 ---------
-Homepage: <https://github.com/yshui/picom>
+Website: <https://allusive.dev>
 
-SEE ALSO
---------
-*xcompmgr*(1), link:picom-trans.html[*picom-trans*(1)]
+GithubPage: <https://github.com/allusive-dev/picom-allusive>
