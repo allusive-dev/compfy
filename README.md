@@ -15,6 +15,15 @@ Makes the animations way smoother and more customizable than the base picom pack
 Context: For unknown reason `picom-pijulius-git` was taken off the AUR. 
 This repository is here to keep this package up-to-date and on the AUR.
 
+
+## Guides
+
+[Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
+
+```
+$ man picom
+```
+
 ## Installation
 
 ### Building Manually
