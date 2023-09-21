@@ -10,6 +10,8 @@ WE NOW HAVE A WIKI!
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on the AUR. This repository/package aims to improve upon and maintain this version of picom.
 
+Currently this revised package has had its code cleaned up and manpages updated to be functional.
+
 ## Guides
 
 [Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
