@@ -4,7 +4,7 @@ project('picom', 'c', version: '8',
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v0.2-1'
+version = 'v0.2.2-4'
 
 add_global_arguments('-DCOMPTON_VERSION="'+version+'"', language: 'c')
 
