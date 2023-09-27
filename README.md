@@ -1,11 +1,9 @@
 # picom
 A Fork of Pijulius picom published by Allusive.
 
-## Announcements
-WE NOW HAVE A WIKI!
-[Check It Out Here](https://github.com/allusive-dev/picom-allusive/wiki)
+## [Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
 
-### Have An Issue? Open one and I will try to help
+#### Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on the AUR. This repository/package aims to improve upon and maintain this version of picom.
