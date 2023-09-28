@@ -616,6 +616,10 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	lcfg_lookup_bool(&cfg, "animation-clamping", &opt->animation_clamping);
 	// --focus-exclude
 	parse_cfg_condlst(&cfg, &opt->focus_blacklist, "focus-exclude");
+	// animation exclude
+	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
+	// animation exclude
+	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
 	// --invert-color-include
 	parse_cfg_condlst(&cfg, &opt->invert_color_list, "invert-color-include");
 	// --blur-background-exclude

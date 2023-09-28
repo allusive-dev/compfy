@@ -548,7 +548,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
                    bool *fading_enable, bool *hasneg, win_option_mask_t *winopt_mask) {
 	// clang-format off
 	*opt = (struct options){
-	    .backend = BKEND_XRENDER,
+	    .backend = BKEND_GLX,
 	    .glx_no_stencil = false,
 	    .mark_wmwin_focused = false,
 	    .mark_ovredir_focused = false,
@@ -571,7 +571,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 	    .shadow_red = 0.0,
 	    .shadow_green = 0.0,
 	    .shadow_blue = 0.0,
-	    .shadow_radius = 18,
+	    .shadow_radius = 12,
 	    .shadow_offset_x = -15,
 	    .shadow_offset_y = -15,
 	    .shadow_opacity = .75,
@@ -580,24 +580,24 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 	    .xinerama_shadow_crop = false,
 	    .shadow_clip_list = NULL,
 
-	    .corner_radius = 0,
+	    .corner_radius = 12,
 
-	    .fade_in_step = 0.028,
+	    .fade_in_step = 0.03,
 	    .fade_out_step = 0.03,
 	    .fade_delta = 10,
 	    .no_fading_openclose = false,
 	    .no_fading_destroyed_argb = false,
 	    .fade_blacklist = NULL,
 
-	    .animations = false,
-	    .animation_for_open_window = OPEN_WINDOW_ANIMATION_NONE,
-	    .animation_for_transient_window = OPEN_WINDOW_ANIMATION_NONE,
-	    .animation_for_unmap_window = OPEN_WINDOW_ANIMATION_AUTO,
-	    .animation_for_workspace_switch_in = OPEN_WINDOW_ANIMATION_AUTO,
-	    .animation_for_workspace_switch_out = OPEN_WINDOW_ANIMATION_AUTO,
-	    .animation_stiffness = 200.0,
-	    .animation_window_mass = 1.0,
-	    .animation_dampening = 25,
+	    .animations = true,
+	    .animation_for_open_window = OPEN_WINDOW_ANIMATION_ZOOM,
+	    .animation_for_transient_window = OPEN_WINDOW_ANIMATION_ZOOM,
+	    .animation_for_unmap_window = OPEN_WINDOW_ANIMATION_ZOOM,
+	    .animation_for_workspace_switch_in = OPEN_WINDOW_ANIMATION_ZOOM,
+	    .animation_for_workspace_switch_out = OPEN_WINDOW_ANIMATION_ZOOM,
+	    .animation_stiffness = 100.0,
+	    .animation_window_mass = 0.5,
+	    .animation_dampening = 10,
 	    .animation_delta = 10,
 	    .animation_force_steps = false,
 	    .animation_clamping = true,
@@ -631,7 +631,10 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 	    .track_leader = false,
 
-	    .rounded_corners_blacklist = NULL
+	    .rounded_corners_blacklist = NULL,
+
+		.animation_open_blacklist = NULL,
+		.animation_unmap_blacklist = NULL
 	};
 	// clang-format on
 

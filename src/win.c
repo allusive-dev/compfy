@@ -457,6 +457,10 @@ static void init_animation(session_t *ps, struct managed_win *w) {
 			animation = ps->o.animation_for_workspace_switch_in;
 	}
 
+	if (c2_match(ps, w, ps->o.animation_open_blacklist, NULL)) {
+		animation = OPEN_WINDOW_ANIMATION_NONE;
+	}
+
 	switch (animation) {
 	case OPEN_WINDOW_ANIMATION_AUTO:
 	case OPEN_WINDOW_ANIMATION_NONE: { // No animation
@@ -570,6 +574,10 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 
 		if (ps->o.wintype_option[w->window_type].animation_unmap < OPEN_WINDOW_ANIMATION_INVALID)
 			animation = ps->o.wintype_option[w->window_type].animation_unmap;
+	}
+
+	if (c2_match(ps, w, ps->o.animation_unmap_blacklist, NULL)) {
+		animation = OPEN_WINDOW_ANIMATION_NONE;
 	}
 
 	if (ps->root_desktop_switch_direction != 0) {

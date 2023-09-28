@@ -527,6 +527,8 @@ static const struct option longopts[] = {
     {"animation-clamping", no_argument, NULL, 808},
     {"animation-for-open-window", required_argument, NULL, 809},
     {"animation-for-transient-window", required_argument, NULL, 810},
+    {"animation-open-exclude", required_argument, NULL, 830},
+    {"animation-unmap-exclude", required_argument, NULL, 831},
     // Must terminate with a NULL entry
     {NULL, 0, NULL, 0},
 };
@@ -985,6 +987,12 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			}
 			break;
 		}
+		case 830:
+			condlst_add(&opt->animation_open_blacklist, optarg);
+			break;
+		case 831:
+			condlst_add(&opt->animation_unmap_blacklist, optarg);
+			break;
 		case 810: {
 			// --animation-for-transient-window
 			enum open_window_animation animation = parse_open_window_animation(optarg);

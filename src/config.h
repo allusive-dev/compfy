@@ -277,6 +277,10 @@ typedef struct options {
 	/// Rounded corners blacklist. A linked list of conditions.
 	c2_lptr_t *rounded_corners_blacklist;
 
+	c2_lptr_t *animation_open_blacklist;
+	
+	c2_lptr_t *animation_unmap_blacklist;
+
 	// === Focus related ===
 	/// Whether to try to detect WM windows and mark them as focused.
 	bool mark_wmwin_focused;
