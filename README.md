@@ -40,8 +40,8 @@ or
 yay -S picom-allusive
 ```
 
-For those on Crystal Linux
+#### Note For NixOS Users
 
-```
-ame -S picom-allusive
-```
+picom-allusive is currently awaiting staff review on nixpkgs. I do not know how long it will take before it is avaliable but in the meantime you may have to wait considering that building picom manually on NixOS is difficult.
+
+Thank you for your patience.
