@@ -1,6 +1,8 @@
 # picom
 A Fork of Pijulius picom published by Allusive.
 
+#### Want to support my work? DM me and [let's chat](https://github.com/allusive-dev/allusive-dev#contact-me).
+
 ## [Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
 
 #### Can't find what you need in the wiki or have an problem? Open an Issue.
