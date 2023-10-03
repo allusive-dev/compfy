@@ -42,7 +42,7 @@ yay -S picom-allusive
 
 #### Note For NixOS Users
 
-picom-allusive has been approved and is wating to be merged. 
+picom-allusive has been approved on nixpkgs and is wating to be merged. 
 I do not know how long it will take before it is avaliable but in the meantime you may have to wait considering that building picom manually on NixOS is difficult.
 
 Thank you for your patience.
