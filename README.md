@@ -42,7 +42,9 @@ yay -S picom-allusive
 
 #### Note For NixOS Users
 
-picom-allusive has been approved on nixpkgs and is wating to be merged. 
+picom-allusive has merged!
+You can check when it reaches `nixos-unstable` [here](https://nixpk.gs/pr-tracker.html?pr=258711).
+The package will not be avaliable on NixOS 23.05 You will have to wait until the next stable update if you are on the stable branch.
 I do not know how long it will take before it is avaliable but in the meantime you may have to wait considering that building picom manually on NixOS is difficult.
 
 Thank you for your patience.
