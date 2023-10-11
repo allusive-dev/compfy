@@ -44,13 +44,22 @@ yay -S picom-allusive
 
 ### NixOS
 
-picom-allusive has merged!
-You can check when it reaches `nixos-unstable` [here](https://nixpk.gs/pr-tracker.html?pr=258711).
+picom-allusive is now avaliable on unstable(23.11)!
+
+Simply do one of the following
+``` nix
+environment.systemPackages = [ pkgs.picom-allusive ];
+```
+or for home-manager
+``` nix
+home.packages = [ pkgs.picom-allusive ];
+```
+
 The package will not be avaliable on NixOS 23.05 You will have to wait until the next stable update if you are on the stable branch.
 
 If you still want to use picom and you are on 23.05 you can use this custom package in either `environment.systemPackages` or `home.packages` for home-manager users. Keep in mind this is considerably unstable so expect possible issues. 
 
-```
+``` nix
       (picom.overrideAttrs (oldAttrs: rec {
         pname = "picom-allusive";
         version = "0.3.1";
