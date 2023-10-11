@@ -42,7 +42,7 @@ or
 yay -S picom-allusive
 ```
 
-#### Note For NixOS Users
+### NixOS
 
 picom-allusive has merged!
 You can check when it reaches `nixos-unstable` [here](https://nixpk.gs/pr-tracker.html?pr=258711).
