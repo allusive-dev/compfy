@@ -1,7 +1,12 @@
 # picom-allusive
 A Fork of Pijulius picom by Allusive.
 
-Want to support my work or just ask a personal question? DM me and [let's chat](https://github.com/allusive-dev/allusive-dev#contact-me).
+Want to support my work or just ask a personal question? DM me and let's chat.
+
+
+[![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
+[![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://docs.allusive.dev/discord)
+[![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
 
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
