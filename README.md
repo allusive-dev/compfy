@@ -1,28 +1,18 @@
-# picom
-A Fork of Pijulius picom published by Allusive.
+# picom-allusive
+A Fork of Pijulius picom by Allusive.
 
-Want to support my work? DM me and [let's chat](https://github.com/allusive-dev/allusive-dev#contact-me).
+Want to support my work or just ask a personal question? DM me and [let's chat](https://github.com/allusive-dev/allusive-dev#contact-me).
+
+## What Is This?
+This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
+
+This is currently the best actively maintained fork of picom adding proper animations.
 
 ## Documentation can now be found live on my website!
 
 https://docs.allusive.dev
 
 Can't find what you need in the docs or have an problem? Open an Issue.
-
-## What Is This?
-This is a fork of picom-pijulius which is avaliable on the AUR. This repository/package aims to improve upon and maintain this version of picom.
-
-Currently this revised package has had its code cleaned up and manpages updated to be functional.
-
-## Guides
-
-[Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
-
-```
-$ man picom
-
-// Above command only works if the package is installed.
-```
 
 ## Installation
 
@@ -35,11 +25,11 @@ $ ninja -C build install
 
 ### Arch Linux or other Arch based distros
 ```
-paru -S picom-allusive
+$ paru -S picom-allusive
 ```
 or
 ```
-yay -S picom-allusive
+$ yay -S picom-allusive
 ```
 
 ### NixOS
