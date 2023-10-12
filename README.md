@@ -13,11 +13,11 @@ This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User
 
 This is currently the best actively maintained fork of picom adding proper animations.
 
-## Documentation can now be found live on my website!
+## Documentation can be found in the Wiki tab above.
 
-https://docs.allusive.dev
+The docs were moved back to Github Wiki because the documentation framework I was using is actually pretty slow and unoptimized so for now things are back to the way they were.
 
-Can't find what you need in the docs or have an problem? Open an Issue.
+Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## Installation
 
