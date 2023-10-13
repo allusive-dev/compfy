@@ -439,6 +439,36 @@ bool parse_rule_opacity(c2_lptr_t **res, const char *src) {
 }
 
 /**
+ * Parse a list of corner rules.
+ */
+bool parse_rule_corners(c2_lptr_t **res, const char *src) {
+	// Find corner value
+	char *endptr = NULL;
+	long val = strtol(src, &endptr, 0);
+	if (!endptr || endptr == src) {
+		log_error("No corner-radius specified: %s", src);
+		return false;
+	}
+	if (val > 100 || val < 0) {
+		log_error("Opacity %ld invalid: %s", val, src);
+		return false;
+	}
+
+	// Skip over spaces
+	while (*endptr && isspace((unsigned char)*endptr))
+		++endptr;
+	if (':' != *endptr) {
+		log_error("Corner terminator not found: %s", src);
+		return false;
+	}
+	++endptr;
+
+	// Parse pattern
+	// I hope 1-100 is acceptable for (void *)
+	return c2_parse(res, endptr, (void *)val);
+}
+
+/**
  * Add a pattern to a condition linked list.
  */
 bool condlst_add(c2_lptr_t **pcondlst, const char *pattern) {
@@ -634,7 +664,8 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 	    .rounded_corners_blacklist = NULL,
 
 		.animation_open_blacklist = NULL,
-		.animation_unmap_blacklist = NULL
+		.animation_unmap_blacklist = NULL,
+	    .corner_rules = NULL
 	};
 	// clang-format on
 
