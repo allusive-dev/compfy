@@ -1393,6 +1393,8 @@ static void win_determine_rounded_corners(session_t *ps, struct managed_win *w) 
 		w->corner_radius = 0;
 		return;
 	}
+	
+	void *val = NULL;
 
 	// Don't round full screen windows & excluded windows
 	if ((w && win_is_fullscreen(ps, w)) ||
@@ -1400,7 +1402,6 @@ static void win_determine_rounded_corners(session_t *ps, struct managed_win *w) 
 		w->corner_radius = 0;
 		log_debug("Not rounding corners for window %#010x", w->base.id);
 	} else if (c2_match(ps, w, ps->o.corner_rules, &val)) {
-		void *val = NULL;
 		w->corner_radius = val;
 	} else {
 		w->corner_radius = ps->o.corner_radius;
