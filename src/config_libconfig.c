@@ -250,6 +250,31 @@ parse_cfg_condlst_opct(options_t *opt, const config_t *pcfg, const char *name) {
 	}
 }
 
+/**
+ * Parse a corner rule list in configuration file.
+ */
+static inline void
+parse_cfg_condlst_corner(options_t *opt, const config_t *pcfg, const char *name) {
+	config_setting_t *setting = config_lookup(pcfg, name);
+	if (setting) {
+		// Parse an array of options
+		if (config_setting_is_array(setting)) {
+			int i = config_setting_length(setting);
+			while (i--)
+				if (!parse_rule_corners(
+				        &opt->corner_rules,
+				        config_setting_get_string_elem(setting, i)))
+					exit(1);
+		}
+		// Treat it as a single pattern if it's a string
+		else if (config_setting_type(setting) == CONFIG_TYPE_STRING) {
+			if (!parse_rule_corners(&opt->corner_rules,
+			                        config_setting_get_string(setting)))
+				exit(1);
+		}
+	}
+}
+
 static inline void parse_wintype_config(const config_t *cfg, const char *member_name,
                                         win_option_t *o, win_option_mask_t *mask) {
 	char *str = mstrjoin("wintypes.", member_name);
@@ -620,6 +645,8 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
 	// animation exclude
 	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
+	// --corners-rule
+	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
 	// --invert-color-include
 	parse_cfg_condlst(&cfg, &opt->invert_color_list, "invert-color-include");
 	// --blur-background-exclude

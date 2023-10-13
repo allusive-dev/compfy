@@ -270,6 +270,8 @@ typedef struct options {
 	c2_lptr_t *invert_color_list;
 	/// Rules to change window opacity.
 	c2_lptr_t *opacity_rules;
+
+	c2_lptr_t *corner_rules;
 	/// Limit window brightness
 	double max_brightness;
 	// Radius of rounded window corners
@@ -314,6 +316,7 @@ bool must_use parse_int(const char *, int *);
 struct conv **must_use parse_blur_kern_lst(const char *, bool *hasneg, int *count);
 bool must_use parse_geometry(session_t *, const char *, region_t *);
 bool must_use parse_rule_opacity(c2_lptr_t **, const char *);
+bool must_use parse_rule_corners(c2_lptr_t **, const char *);
 enum blur_method must_use parse_blur_method(const char *src);
 enum open_window_animation must_use parse_open_window_animation(const char *src);
 

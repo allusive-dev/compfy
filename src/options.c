@@ -529,6 +529,7 @@ static const struct option longopts[] = {
     {"animation-for-transient-window", required_argument, NULL, 810},
     {"animation-open-exclude", required_argument, NULL, 830},
     {"animation-unmap-exclude", required_argument, NULL, 831},
+    {"corners-rule", required_argument, NULL, 840},
     // Must terminate with a NULL entry
     {NULL, 0, NULL, 0},
 };
@@ -992,6 +993,11 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			break;
 		case 831:
 			condlst_add(&opt->animation_unmap_blacklist, optarg);
+			break;
+		case 840:
+			// --opacity-rule
+			if (!parse_rule_corners(&opt->corner_rules, optarg))
+				exit(1);
 			break;
 		case 810: {
 			// --animation-for-transient-window
