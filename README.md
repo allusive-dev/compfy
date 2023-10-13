@@ -1,26 +1,23 @@
-# picom
-A Fork of Pijulius picom published by Allusive.
+# picom-allusive
+A Fork of Pijulius picom by Allusive.
 
-Want to support my work? DM me and [let's chat](https://github.com/allusive-dev/allusive-dev#contact-me).
+Want to support my work or just ask a personal question? DM me and let's chat.
 
-## [Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
 
-Can't find what you need in the wiki or have an problem? Open an Issue.
+[![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
+[![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://docs.allusive.dev/discord)
+[![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
 
 ## What Is This?
-This is a fork of picom-pijulius which is avaliable on the AUR. This repository/package aims to improve upon and maintain this version of picom.
+This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
 
-Currently this revised package has had its code cleaned up and manpages updated to be functional.
+This is currently the best actively maintained fork of picom adding proper animations.
 
-## Guides
+## Documentation can be found in the Wiki tab above.
 
-[Wiki](https://github.com/allusive-dev/picom-allusive/wiki)
+The docs were moved back to Github Wiki because the documentation framework I was using is actually pretty slow and unoptimized so for now things are back to the way they were.
 
-```
-$ man picom
-
-// Above command only works if the package is installed.
-```
+Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## Installation
 
@@ -33,18 +30,46 @@ $ ninja -C build install
 
 ### Arch Linux or other Arch based distros
 ```
-paru -S picom-allusive
+$ paru -S picom-allusive
 ```
 or
 ```
-yay -S picom-allusive
+$ yay -S picom-allusive
 ```
 
-#### Note For NixOS Users
+### NixOS
 
-picom-allusive has merged!
-You can check when it reaches `nixos-unstable` [here](https://nixpk.gs/pr-tracker.html?pr=258711).
+picom-allusive is now avaliable on unstable(23.11)!
+
+Simply do one of the following
+``` nix
+environment.systemPackages = [ pkgs.picom-allusive ];
+```
+or for home-manager
+``` nix
+home.packages = [ pkgs.picom-allusive ];
+```
+
 The package will not be avaliable on NixOS 23.05 You will have to wait until the next stable update if you are on the stable branch.
-I do not know how long it will take before it is avaliable but in the meantime you may have to wait considering that building picom manually on NixOS is difficult.
+
+If you still want to use picom and you are on 23.05 you can use this custom package in either `environment.systemPackages` or `home.packages` for home-manager users. Keep in mind this is considerably unstable so expect possible issues. 
+
+``` nix
+      (picom.overrideAttrs (oldAttrs: rec {
+        pname = "picom-allusive";
+        version = "0.3.1";
+        src = pkgs.fetchFromGitHub {
+          owner = "allusive-dev";
+          repo = "picom-allusive";
+          rev = version;
+          hash = "sha256-lk4Ll0mi9h3BAqwgOzFQw4WYKnSW9XTl3PjoK2E4WKg=";
+        };
+        postInstall =
+          ''
+            chmod +x $out/bin/picom-trans
+          ''
+          + oldAttrs.postInstall;
+      }))
+```
 
 Thank you for your patience.
