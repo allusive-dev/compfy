@@ -41,6 +41,8 @@ $ yay -S picom-allusive
 
 picom-allusive is now avaliable on unstable(23.11)!
 
+Keep in mind it can take up to a week after picom is updated before it wil be avaliable on NixOS.
+
 Simply do one of the following
 ``` nix
 environment.systemPackages = [ pkgs.picom-allusive ];
