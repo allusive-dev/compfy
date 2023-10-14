@@ -30,6 +30,10 @@ $ ninja -C build install
 ```
 
 ### Arch Linux or other Arch based distros
+
+**Note for 0.3.2**
+
+**MAKE SURE YOU ARE USING 0.3.2-6 OTHERWISE THE PACKAGE MAY NOT BUILD!!!**
 ```
 $ paru -S picom-allusive
 ```
