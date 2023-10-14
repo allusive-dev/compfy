@@ -60,12 +60,12 @@ If you still want to use picom and you are on 23.05 you can use this custom pack
 ``` nix
       (picom.overrideAttrs (oldAttrs: rec {
         pname = "picom-allusive";
-        version = "0.3.1";
+        version = "0.3.2";
         src = pkgs.fetchFromGitHub {
           owner = "allusive-dev";
           repo = "picom-allusive";
           rev = version;
-          hash = "sha256-lk4Ll0mi9h3BAqwgOzFQw4WYKnSW9XTl3PjoK2E4WKg=";
+          hash = "sha256-1zWntz2QKp/O9ZuOUZy9NkCNXFsBqRRvcd0SAr+7G/o=";
         };
         postInstall =
           ''
@@ -73,6 +73,7 @@ If you still want to use picom and you are on 23.05 you can use this custom pack
           ''
           + oldAttrs.postInstall;
       }))
+    ];
 ```
 
 Thank you for your patience.
