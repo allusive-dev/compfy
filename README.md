@@ -13,9 +13,6 @@ This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User
 
 This is currently the best actively maintained fork of picom adding proper animations.
 
-Here is a little preview of this package on my system with animations and all.
-
-[Preview Video](tba)
 
 ## Documentation can be found in the Wiki tab above.
 
