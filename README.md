@@ -8,6 +8,9 @@ Want to support my work or just ask a personal question? DM me and let's chat.
 [![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://github.com/allusive-dev/allusive-dev#contact-me)
 [![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
 
+Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
+Can get to 100 stars on GitHub next?
+
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
 
