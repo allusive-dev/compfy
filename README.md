@@ -11,6 +11,11 @@ Want to support my work or just ask a personal question? DM me and let's chat.
 Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
 Can we get to 100 stars on GitHub next?
 
+### Announcemens
+
+I'm currently working on updating picom-allusive to the latest upstream version of picom, being 10.2
+I hope to have it released before the end of this year as update 1.0!
+
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
 
