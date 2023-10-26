@@ -15,7 +15,7 @@ Can we get to 100 stars on GitHub next?
 
 I'm currently working on updating picom-allusive to the latest upstream version of picom, being 10.2
 
-I hope to have it released before the end of this year as update 1.0!
+I hope to have it released before the end of this year as update 1.0.0!
 
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
