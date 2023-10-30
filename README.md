@@ -1,8 +1,7 @@
 # picom-allusive
 A Fork of Pijulius picom by Allusive.
 
-Want to support my work or just ask a personal question? DM me and let's chat.
-
+Want to chat or maybe help bug test? Contatc me here:
 
 [![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
 [![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://github.com/allusive-dev/allusive-dev#contact-me)
@@ -10,6 +9,9 @@ Want to support my work or just ask a personal question? DM me and let's chat.
 
 Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
 Can we get to 100 stars on GitHub next?
+
+If you are feelling really generous I now have GitHub sponsor setup so you can support my work more directly.
+Even if you can only give a small amount it goes a long way!
 
 ### Announcements
 
@@ -48,9 +50,6 @@ $ ninja -C build install
 
 ### Arch Linux or other Arch based distros
 
-**Note for 0.3.2**
-
-**MAKE SURE YOU ARE USING 0.3.2-6 OTHERWISE THE PACKAGE MAY NOT BUILD!!!**
 ```
 $ paru -S picom-allusive
 ```
