@@ -830,7 +830,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 	    .animations = true,
 	    .animation_for_open_window = OPEN_WINDOW_ANIMATION_ZOOM,
-	    .animation_for_transient_window = OPEN_WINDOW_ANIMATION_NONE,
+	    .animation_for_transient_window = OPEN_WINDOW_ANIMATION_ZOOM,
 	    .animation_for_unmap_window = OPEN_WINDOW_ANIMATION_ZOOM,
 	    .animation_for_workspace_switch_in = OPEN_WINDOW_ANIMATION_ZOOM,
 	    .animation_for_workspace_switch_out = OPEN_WINDOW_ANIMATION_ZOOM,
@@ -871,7 +871,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 	    .use_ewmh_active_win = false,
 	    .focus_blacklist = NULL,
-	    .detect_transient = false,
+	    .detect_transient = true,
 	    .detect_client_leader = false,
 	    .no_ewmh_fullscreen = false,
 
