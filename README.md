@@ -15,6 +15,8 @@ Can we get to 100 stars on GitHub next?
 
 UPDATE 1.0.0 IS HERE!!!
 
+Please check out the updated documentation!
+
 Here is a full list of features that are now avaliable in `v1.0`
 
 - Includes all fixes and changes from `yshui/picom-v10.2`
