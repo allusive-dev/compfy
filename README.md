@@ -11,11 +11,17 @@ Want to support my work or just ask a personal question? DM me and let's chat.
 Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
 Can we get to 100 stars on GitHub next?
 
-### Announcemens
+### AnnouncemenTs
 
-I'm currently working on updating picom-allusive to the latest upstream version of picom, being 10.2
+UPDATE 1.0.0 IS HERE!!!
 
-I hope to have it released before the end of this year as update 1.0.0!
+Here is a full list of features that are now avaliable in `v1.0`
+
+- Includes all fixes and changes from `yshui/picom-v10.2`
+- Includes pijulius animation code.
+- Includes corners-rule. Allowing you to set the corner-radius on a per window basis.
+- Animation open and unmap exclusion lists! Don't want something animating? Now you can fix that.
+- Blur rules. Background blurring is now done on a whitelist basis to preserve performance.
 
 ## What Is This?
 This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
