@@ -16,6 +16,7 @@
 extern struct backend_operations xrender_ops, dummy_ops;
 #ifdef CONFIG_OPENGL
 extern struct backend_operations glx_ops;
+extern struct backend_operations egl_ops;
 #endif
 
 struct backend_operations *backend_list[NUM_BKEND] = {
@@ -23,6 +24,7 @@ struct backend_operations *backend_list[NUM_BKEND] = {
     [BKEND_DUMMY] = &dummy_ops,
 #ifdef CONFIG_OPENGL
     [BKEND_GLX] = &glx_ops,
+    [BKEND_EGL] = &egl_ops,
 #endif
 };
 
@@ -44,13 +46,38 @@ region_t get_damage(session_t *ps, bool all_damage) {
 	} else {
 		for (int i = 0; i < buffer_age; i++) {
 			auto curr = ((ps->damage - ps->damage_ring) + i) % ps->ndamage;
-			log_trace("damage index: %d, damage ring offset: %ld", i, curr);
+			log_trace("damage index: %d, damage ring offset: %td", i, curr);
 			dump_region(&ps->damage_ring[curr]);
 			pixman_region32_union(&region, &region, &ps->damage_ring[curr]);
 		}
 		pixman_region32_intersect(&region, &region, &ps->screen_reg);
 	}
 	return region;
+}
+
+void handle_device_reset(session_t *ps) {
+	log_error("Device reset detected");
+	// Wait for reset to complete
+	// Although ideally the backend should return DEVICE_STATUS_NORMAL after a reset
+	// is completed, it's not always possible.
+	//
+	// According to ARB_robustness (emphasis mine):
+	//
+	//     "If a reset status other than NO_ERROR is returned and subsequent
+	//     calls return NO_ERROR, the context reset was encountered and
+	//     completed. If a reset status is repeatedly returned, the context **may**
+	//     be in the process of resetting."
+	//
+	//  Which means it may also not be in the process of resetting. For example on
+	//  AMDGPU devices, Mesa OpenGL always return CONTEXT_RESET after a reset has
+	//  started, completed or not.
+	//
+	//  So here we blindly wait 5 seconds and hope ourselves best of the luck.
+	sleep(5);
+
+	// Reset picom
+	log_info("Resetting picom after device reset");
+	ev_break(ps->loop, EVBREAK_ALL);
 }
 
 static void process_window_for_painting(session_t *ps, struct managed_win* w, void* win_image,
@@ -66,6 +93,7 @@ static void process_window_for_painting(session_t *ps, struct managed_win* w, vo
 	// reg_visible as a hint. Since window image data outside of the
 	// damage region won't be painted onto target
 	region_t reg_visible_local;
+	coord_t window_coord = {.x = w->g.x, .y = w->g.y};
 	{
 		// The bounding shape, in window local coordinates
 		region_t reg_bound_local;
@@ -75,16 +103,15 @@ static void process_window_for_painting(session_t *ps, struct managed_win* w, vo
 
 		pixman_region32_init(&reg_visible_local);
 		pixman_region32_intersect(&reg_visible_local,
-					  reg_visible, reg_paint);
+					  			  reg_visible, reg_paint);
 		pixman_region32_translate(&reg_visible_local, -w->g.x,
-					  -w->g.y);
+					  			  -w->g.y);
 		// Data outside of the bounding shape won't be visible,
 		// but it is not necessary to limit the image operations
 		// to the bounding shape yet. So pass that as the visible
 		// region, not the clip region.
 		pixman_region32_intersect(
 		    &reg_visible_local, &reg_visible_local, &reg_bound_local);
-		pixman_region32_fini(&reg_bound_local);
 	}
 
 	auto new_img = ps->backend_data->ops->clone_image(
@@ -98,15 +125,18 @@ static void process_window_for_painting(session_t *ps, struct managed_win* w, vo
 	    &reg_visible_local, (double[]){w->frame_opacity});
 	pixman_region32_fini(&reg_frame);
 	ps->backend_data->ops->compose(ps->backend_data, new_img,
-				       w->g.x, w->g.y,
-				       w->g.x + w->widthb, w->g.y + w->heightb,
-				       reg_paint_in_bound, reg_visible);
+			                       window_coord, NULL, window_coord,
+			                       reg_paint_in_bound, reg_visible);
 	ps->backend_data->ops->release_image(ps->backend_data, new_img);
 	pixman_region32_fini(&reg_visible_local);
 }
 
 /// paint all windows
 void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
+	if (ps->backend_data->ops->device_status &&
+	    ps->backend_data->ops->device_status(ps->backend_data) != DEVICE_STATUS_NORMAL) {
+		return handle_device_reset(ps);
+	}
 	if (ps->o.xrender_sync_fence) {
 		if (ps->xsync_exists && !x_fence_sync(ps->c, ps->sync_fence)) {
 			log_error("x_fence_sync failed, xrender-sync-fence will be "
@@ -206,7 +236,7 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 
 	if (ps->root_image) {
 		ps->backend_data->ops->compose(ps->backend_data, ps->root_image,
-					       0, 0, ps->root_width, ps->root_height,
+		                               (coord_t){0}, NULL, (coord_t){0},
 		                               &reg_paint, &reg_visible);
 	} else {
 		ps->backend_data->ops->fill(ps->backend_data, (struct color){0, 0, 0, 1},
@@ -227,6 +257,12 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 		// The bounding shape of the window, in global/target coordinates
 		// reminder: bounding shape contains the WM frame
 		auto reg_bound = win_get_bounding_shape_global_by_val(w);
+		auto reg_bound_no_corner =
+		    win_get_bounding_shape_global_without_corners_by_val(w);
+
+		if (!w->mask_image && (w->bounding_shaped || w->corner_radius != 0)) {
+			win_bind_mask(ps->backend_data, w);
+		}
 
 		// The clip region for the current window, in global/target coordinates
 		// reg_paint_in_bound \in reg_paint
@@ -250,7 +286,9 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 		 * (e.g. with shaders), we should consult the backend whether the window
 		 * is transparent or not. for now we will just rely on the force_win_blend
 		 * option */
+
 		auto real_win_mode = w->mode;
+		coord_t window_coord = {.x = w->g.x, .y = w->g.y};
 
 		if (w->blur_background &&
 		    (ps->o.force_win_blend || real_win_mode == WMODE_TRANS ||
@@ -294,7 +332,8 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 				// We need to blur the bounding shape of the window
 				// (reg_paint_in_bound = reg_bound \cap reg_paint)
 				ps->backend_data->ops->blur(
-				    ps->backend_data, blur_opacity, ps->backend_blur_context,
+				    ps->backend_data, blur_opacity,
+				    ps->backend_blur_context, w->mask_image, window_coord,
 				    &reg_paint_in_bound, &reg_visible);
 			} else {
 				// Window itself is solid, we only need to blur the frame
@@ -313,9 +352,9 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 					pixman_region32_intersect(&reg_blur, &reg_blur,
 					                          &reg_visible);
 				}
-				ps->backend_data->ops->blur(ps->backend_data, blur_opacity,
-				                            ps->backend_blur_context,
-				                            &reg_blur, &reg_visible);
+				ps->backend_data->ops->blur(
+				    ps->backend_data, blur_opacity, ps->backend_blur_context,
+				    w->mask_image, window_coord, &reg_blur, &reg_visible);
 				pixman_region32_fini(&reg_blur);
 			}
 		}
@@ -327,9 +366,6 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 			// reg_shadow \in reg_paint
 			auto reg_shadow = win_extents_by_val(w);
 			pixman_region32_intersect(&reg_shadow, &reg_shadow, &reg_paint);
-			if (!ps->o.wintype_option[w->window_type].full_shadow) {
-				pixman_region32_subtract(&reg_shadow, &reg_shadow, &reg_bound);
-			}
 
 			// Mask out the region we don't want shadow on
 			if (pixman_region32_not_empty(&ps->shadow_exclude_reg)) {
@@ -365,12 +401,28 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 			ps->backend_data->ops->set_image_property(
 			    ps->backend_data, IMAGE_PROPERTY_OPACITY, w->shadow_image,
 			    &w->opacity);
+			coord_t shadow_coord = {.x = w->g.x + w->shadow_dx,
+			                        .y = w->g.y + w->shadow_dy};
+
+			auto inverted_mask = NULL;
+			if (!ps->o.wintype_option[w->window_type].full_shadow) {
+				pixman_region32_subtract(&reg_shadow, &reg_shadow,
+				                         &reg_bound_no_corner);
+				if (w->mask_image) {
+					inverted_mask = w->mask_image;
+					ps->backend_data->ops->set_image_property(
+					    ps->backend_data, IMAGE_PROPERTY_INVERTED,
+					    inverted_mask, (bool[]){true});
+				}
+			}
 			ps->backend_data->ops->compose(
-			    ps->backend_data, w->shadow_image,
-			    w->g.x + w->shadow_dx, w->g.y + w->shadow_dy,
-			    w->g.x + w->shadow_dx + w->shadow_width,
-			    w->g.y + w->shadow_dy + w->shadow_height,
-			    &reg_shadow, &reg_visible);
+			    ps->backend_data, w->shadow_image, shadow_coord,
+			    inverted_mask, window_coord, &reg_shadow, &reg_visible);
+			if (inverted_mask) {
+				ps->backend_data->ops->set_image_property(
+				    ps->backend_data, IMAGE_PROPERTY_INVERTED,
+				    inverted_mask, (bool[]){false});
+			}
 			pixman_region32_fini(&reg_shadow);
 		}
 
@@ -395,6 +447,25 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 			    &dim_opacity);
 			ps->backend_data->ops->set_image_property(
 			    ps->backend_data, IMAGE_PROPERTY_OPACITY, w->win_image, &w->opacity);
+			ps->backend_data->ops->set_image_property(
+			    ps->backend_data, IMAGE_PROPERTY_CORNER_RADIUS, w->win_image,
+			    (double[]){w->corner_radius});
+			if (w->corner_radius) {
+				int border_width = w->g.border_width;
+				if (border_width == 0) {
+					// Some WM has borders implemented as WM frames
+					border_width = min3(w->frame_extents.left,
+					                    w->frame_extents.right,
+					                    w->frame_extents.bottom);
+				}
+				ps->backend_data->ops->set_image_property(
+				    ps->backend_data, IMAGE_PROPERTY_BORDER_WIDTH,
+				    w->win_image, &border_width);
+			}
+
+			ps->backend_data->ops->set_image_property(
+			    ps->backend_data, IMAGE_PROPERTY_CUSTOM_SHADER, w->win_image,
+			    w->fg_shader ? (void *)w->fg_shader->backend_shader : NULL);
 		}
 
 		if (w->opacity * MAX_ALPHA < 1) {
@@ -411,13 +482,12 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 			pixman_region32_subtract(&reg_shadow_clip, &reg_shadow_clip, &reg_bound);
 		}
 
-		// Draw window on target
 		bool is_animating = 0 <= w->animation_progress && w->animation_progress < 1.0;
+		// Draw window on target
 		if (w->frame_opacity == 1 && !is_animating) {
 			ps->backend_data->ops->compose(ps->backend_data, w->win_image,
-									w->g.x, w->g.y,
-									w->g.x + w->widthb, w->g.y + w->heightb,
-									&reg_paint_in_bound, &reg_visible);
+			                               window_coord, NULL, window_coord,
+			                               &reg_paint_in_bound, &reg_visible);
 		} else {
 			if (is_animating && w->old_win_image) {
 				assert(w->old_win_image);

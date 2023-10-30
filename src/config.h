@@ -15,6 +15,8 @@
 #include <xcb/xcb.h>
 #include <xcb/xfixes.h>
 
+#include "uthash_extra.h"
+
 #ifdef CONFIG_LIBCONFIG
 #include <libconfig.h>
 #endif
@@ -34,6 +36,7 @@ enum backend {
 	BKEND_GLX,
 	BKEND_XR_GLX_HYBRID,
 	BKEND_DUMMY,
+	BKEND_EGL,
 	NUM_BKEND,
 };
 
@@ -100,8 +103,8 @@ typedef struct options {
 	/// Render to a separate window instead of taking over the screen
 	bool debug_mode;
 	// === General ===
-	/// Use the experimental new backends?
-	bool experimental_backends;
+	/// Use the legacy backends?
+	bool legacy_backends;
 	/// Path to write PID to.
 	char *write_pid_path;
 	/// The backend in use.
@@ -152,10 +155,6 @@ typedef struct options {
 	win_option_t wintype_option[NUM_WINTYPES];
 
 	// === VSync & software optimization ===
-	/// User-specified refresh rate.
-	int refresh_rate;
-	/// Whether to enable refresh-rate-based software optimization.
-	bool sw_opti;
 	/// VSync method to use;
 	bool vsync;
 	/// Whether to use glFinish() instead of glFlush() for (possibly) better
@@ -221,12 +220,10 @@ typedef struct options {
 	bool animation_force_steps;
 	/// Whether to clamp animations
 	bool animation_clamping;
-	/// TODO: window animation blacklist
-	/// TODO: open/close animations
 
 	// === Opacity ===
 	/// Default opacity for inactive windows.
-	/// 32-bit integer with the format of _NET_WM_OPACITY.
+	/// 32-bit integer with the format of _NET_WM_WINDOW_OPACITY.
 	double inactive_opacity;
 	/// Default opacity for inactive windows.
 	double active_opacity;
@@ -236,8 +233,8 @@ typedef struct options {
 	/// Frame opacity. Relative to window opacity, also affects shadow
 	/// opacity.
 	double frame_opacity;
-	/// Whether to detect _NET_WM_OPACITY on client windows. Used on window
-	/// managers that don't pass _NET_WM_OPACITY to frame windows.
+	/// Whether to detect _NET_WM_WINDOW_OPACITY on client windows. Used on window
+	/// managers that don't pass _NET_WM_WINDOW_OPACITY to frame windows.
 	bool detect_client_opacity;
 
 	// === Other window processing ===
@@ -261,6 +258,10 @@ typedef struct options {
 	struct conv **blur_kerns;
 	/// Number of convolution kernels
 	int blur_kernel_count;
+	/// Custom fragment shader for painting windows
+	char *window_shader_fg;
+	/// Rules to change custom fragment shader for painting windows.
+	c2_lptr_t *window_shader_fg_rules;
 	/// How much to dim an inactive window. 0.0 - 1.0, 0 to disable.
 	double inactive_dim;
 	/// Whether to use fixed inactive dim opacity, instead of deciding
@@ -270,18 +271,20 @@ typedef struct options {
 	c2_lptr_t *invert_color_list;
 	/// Rules to change window opacity.
 	c2_lptr_t *opacity_rules;
-
+	// Rules for setting corner radius 
 	c2_lptr_t *corner_rules;
+	// Rules to make windows use blur
+	c2_lptr_t *blur_rules;
+	// Rules to exclude windows from having a open animation
+	c2_lptr_t *animation_open_blacklist;
+	// Rules to exclude windows from having a unmap animation	
+	c2_lptr_t *animation_unmap_blacklist;
 	/// Limit window brightness
 	double max_brightness;
 	// Radius of rounded window corners
 	int corner_radius;
 	/// Rounded corners blacklist. A linked list of conditions.
 	c2_lptr_t *rounded_corners_blacklist;
-
-	c2_lptr_t *animation_open_blacklist;
-	
-	c2_lptr_t *animation_unmap_blacklist;
 
 	// === Focus related ===
 	/// Whether to try to detect WM windows and mark them as focused.
@@ -307,6 +310,9 @@ typedef struct options {
 	// Make transparent windows clip other windows, instead of blending on top of
 	// them
 	bool transparent_clipping;
+	/// A list of conditions of windows to which transparent clipping
+	/// should not apply
+	c2_lptr_t *transparent_clipping_blacklist;
 } options_t;
 
 extern const char *const BACKEND_STRS[NUM_BKEND + 1];
@@ -316,7 +322,9 @@ bool must_use parse_int(const char *, int *);
 struct conv **must_use parse_blur_kern_lst(const char *, bool *hasneg, int *count);
 bool must_use parse_geometry(session_t *, const char *, region_t *);
 bool must_use parse_rule_opacity(c2_lptr_t **, const char *);
-bool must_use parse_rule_corners(c2_lptr_t **, const char *);
+bool must_use parse_rule_window_shader(c2_lptr_t **, const char *, const char *);
+char *must_use locate_auxiliary_file(const char *scope, const char *path,
+                                     const char *include_dir);
 enum blur_method must_use parse_blur_method(const char *src);
 enum open_window_animation must_use parse_open_window_animation(const char *src);
 
@@ -326,6 +334,9 @@ enum open_window_animation must_use parse_open_window_animation(const char *src)
 bool condlst_add(c2_lptr_t **, const char *);
 
 #ifdef CONFIG_LIBCONFIG
+const char *xdg_config_home(void);
+char **xdg_config_dirs(void);
+
 /// Parse a configuration file
 /// Returns the actually config_file name used, allocated on heap
 /// Outputs:

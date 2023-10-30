@@ -7,6 +7,8 @@
 #include <xcb/render.h>
 #include <xcb/xcb.h>
 
+#include <backend/backend.h>
+
 #include "uthash_extra.h"
 
 // FIXME shouldn't need this
@@ -105,6 +107,7 @@ struct managed_win {
 	void *win_image;
 	void *old_win_image; // Old window image for interpolating window contents during animations
 	void *shadow_image;
+	void *mask_image;
 	/// Pointer to the next higher window to paint.
 	struct managed_win *prev_trans;
 	/// Number of windows above this window
@@ -140,7 +143,7 @@ struct managed_win {
 	/// bitmap for properties which needs to be updated
 	uint64_t *stale_props;
 	/// number of uint64_ts that has been allocated for stale_props
-	uint64_t stale_props_capacity;
+	size_t stale_props_capacity;
 
 	/// Bounding shape of the window. In local coordinates.
 	/// See above about coordinate systems.
@@ -171,6 +174,7 @@ struct managed_win {
 	bool unredir_if_possible_excluded;
 	/// Whether this window is in open/close state.
 	bool in_openclose;
+
 	/// Whether this window was transient when animated on open
 	bool animation_transient;
 	/// Current position and destination, for animation
@@ -225,7 +229,8 @@ struct managed_win {
 	/// Previous window opacity.
 	double opacity_target_old;
 	/// true if window (or client window, for broken window managers
-	/// not transferring client window's _NET_WM_OPACITY value) has opacity prop
+	/// not transferring client window's _NET_WM_WINDOW_OPACITY value) has opacity
+	/// prop
 	bool has_opacity_prop;
 	/// Cached value of opacity window attribute.
 	opacity_t opacity_prop;
@@ -243,6 +248,9 @@ struct managed_win {
 	switch_t fade_force;
 	/// Whether fading is excluded by the rules. Calculated.
 	bool fade_excluded;
+
+	/// Whether transparent clipping is excluded by the rules.
+	bool transparent_clipping_excluded;
 
 	// Frame-opacity-related members
 	/// Current window frame opacity. Affected by window opacity.
@@ -269,7 +277,7 @@ struct managed_win {
 	paint_t shadow_paint;
 	/// The value of _COMPTON_SHADOW attribute of the window. Below 0 for
 	/// none.
-	long prop_shadow;
+	long long prop_shadow;
 	/// Do not paint shadow over this window.
 	bool clip_shadow_above;
 
@@ -286,6 +294,9 @@ struct managed_win {
 	/// Whether to blur window background.
 	bool blur_background;
 
+	/// The custom window shader to use when rendering.
+	struct shader_info *fg_shader;
+
 #ifdef CONFIG_OPENGL
 	/// Textures and FBO background blur use.
 	glx_blur_cache_t glx_blur_cache;
@@ -298,9 +309,10 @@ struct managed_win {
 /// section
 void win_process_update_flags(session_t *ps, struct managed_win *w);
 void win_process_image_flags(session_t *ps, struct managed_win *w);
+bool win_bind_mask(struct backend_base *b, struct managed_win *w);
 /// Bind a shadow to the window, with color `c` and shadow kernel `kernel`
 bool win_bind_shadow(struct backend_base *b, struct managed_win *w, struct color c,
-                     struct conv *kernel);
+                     struct backend_shadow_context *kernel);
 
 /// Start the unmap of a window. We cannot unmap immediately since we might need to fade
 /// the window out.

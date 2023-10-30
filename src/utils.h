@@ -14,6 +14,8 @@
 
 #include <test.h>
 
+#include <time.h>
+
 #include "compiler.h"
 #include "types.h"
 
@@ -80,39 +82,39 @@ safe_isnan(double a) {
 
 #define to_int_checked(val)                                                              \
 	({                                                                               \
-		int64_t tmp = (val);                                                     \
-		ASSERT_IN_RANGE(tmp, INT_MIN, INT_MAX);                                  \
-		(int)tmp;                                                                \
+		int64_t __to_tmp = (val);                                                \
+		ASSERT_IN_RANGE(__to_tmp, INT_MIN, INT_MAX);                             \
+		(int)__to_tmp;                                                           \
 	})
 
 #define to_char_checked(val)                                                             \
 	({                                                                               \
-		int64_t tmp = (val);                                                     \
-		ASSERT_IN_RANGE(tmp, CHAR_MIN, CHAR_MAX);                                \
-		(char)tmp;                                                               \
+		int64_t __to_tmp = (val);                                                \
+		ASSERT_IN_RANGE(__to_tmp, CHAR_MIN, CHAR_MAX);                           \
+		(char)__to_tmp;                                                          \
 	})
 
 #define to_u16_checked(val)                                                              \
 	({                                                                               \
-		auto tmp = (val);                                                        \
-		ASSERT_IN_RANGE(tmp, 0, UINT16_MAX);                                     \
-		(uint16_t) tmp;                                                          \
+		auto __to_tmp = (val);                                                   \
+		ASSERT_IN_RANGE(__to_tmp, 0, UINT16_MAX);                                \
+		(uint16_t) __to_tmp;                                                     \
 	})
 
 #define to_i16_checked(val)                                                              \
 	({                                                                               \
-		int64_t tmp = (val);                                                     \
-		ASSERT_IN_RANGE(tmp, INT16_MIN, INT16_MAX);                              \
-		(int16_t) tmp;                                                           \
+		int64_t __to_tmp = (val);                                                \
+		ASSERT_IN_RANGE(__to_tmp, INT16_MIN, INT16_MAX);                         \
+		(int16_t) __to_tmp;                                                      \
 	})
 
 #define to_u32_checked(val)                                                              \
 	({                                                                               \
-		auto tmp = (val);                                                        \
+		auto __to_tmp = (val);                                                   \
 		int64_t max attr_unused = UINT32_MAX; /* silence clang tautological      \
 		                                         comparison warning*/            \
-		ASSERT_IN_RANGE(tmp, 0, max);                                            \
-		(uint32_t) tmp;                                                          \
+		ASSERT_IN_RANGE(__to_tmp, 0, max);                                       \
+		(uint32_t) __to_tmp;                                                     \
 	})
 /**
  * Normalize an int value to a specific range.
@@ -130,21 +132,9 @@ static inline int attr_const normalize_i_range(int i, int min, int max) {
 	return i;
 }
 
-/**
- * Linearly interpolate from a range into another.
- *
- * @param  a,b   first range
- * @param  c,d   second range
- * @param  value value to interpolate, should be in range [a,b]
- * @return interpolated value in range [c,d]
- */
-static inline int attr_const lerp_range(int a, int b, int c, int d, int value) {
-	ASSERT_IN_RANGE(value, a, b);
-	return (d-c)*(value-a)/(b-a) + c;
-}
-
 #define min2(a, b) ((a) > (b) ? (b) : (a))
 #define max2(a, b) ((a) > (b) ? (a) : (b))
+#define min3(a, b, c) min2(a, min2(b, c))
 
 /// clamp `val` into interval [min, max]
 #define clamp(val, min, max) max2(min2(val, max), min)
@@ -283,6 +273,15 @@ allocchk_(const char *func_name, const char *file, unsigned int line, void *ptr)
 	void name##_ref(type *a);                                                        \
 	void name##_unref(type **a);
 
+static inline void free_charpp(char **str) {
+	if (str) {
+		free(*str);
+		*str = NULL;
+	}
+}
+
+/// An allocated char* that is automatically freed when it goes out of scope.
+#define scoped_charp char *cleanup(free_charpp)
 
 ///
 /// Calculates next closest power of two of 32bit integer n
@@ -290,5 +289,18 @@ allocchk_(const char *func_name, const char *file, unsigned int line, void *ptr)
 ///
 int next_power_of_two(int n);
 
+// Some versions of the Android libc do not have timespec_get(), use
+// clock_gettime() instead.
+#ifdef __ANDROID__
+
+#ifndef TIME_UTC
+#define TIME_UTC 1
+#endif
+
+static inline int timespec_get(struct timespec *ts, int base) {
+	assert(base == TIME_UTC);
+	return clock_gettime(CLOCK_REALTIME, ts);
+}
+#endif
 
 // vim: set noet sw=8 ts=8 :

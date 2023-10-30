@@ -40,8 +40,6 @@ uint32_t determine_evmask(session_t *ps, xcb_window_t wid, win_evmode_t mode);
 
 void circulate_win(session_t *ps, xcb_circulate_notify_event_t *ce);
 
-void update_refresh_rate(session_t *ps);
-
 void root_damaged(session_t *ps);
 
 void cxinerama_upd_scrs(session_t *ps);
@@ -84,14 +82,6 @@ static inline bool array_wid_exists(const xcb_window_t *arr, int count, xcb_wind
 	}
 
 	return false;
-}
-
-/**
- * Destroy a condition list.
- */
-static inline void free_wincondlst(c2_lptr_t **pcondlst) {
-	while ((*pcondlst = c2_free_lptr(*pcondlst)))
-		continue;
 }
 
 #ifndef CONFIG_OPENGL

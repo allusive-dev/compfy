@@ -36,9 +36,9 @@
 #include <X11/Xlib.h>
 #include <ev.h>
 #include <pixman.h>
-#include <xcb/xproto.h>
 #include <xcb/render.h>
 #include <xcb/sync.h>
+#include <xcb/xproto.h>
 
 #include "uthash_extra.h"
 #ifdef CONFIG_OPENGL
@@ -55,11 +55,11 @@
 #include "backend/driver.h"
 #include "compiler.h"
 #include "config.h"
+#include "list.h"
 #include "region.h"
+#include "render.h"
 #include "types.h"
 #include "utils.h"
-#include "list.h"
-#include "render.h"
 #include "win_defs.h"
 #include "x.h"
 
@@ -130,6 +130,14 @@ typedef struct _latom {
 	struct _latom *next;
 } latom_t;
 
+struct shader_info {
+	char *key;
+	char *source;
+	void *backend_shader;
+	uint64_t attributes;
+	UT_hash_handle hh;
+};
+
 /// Structure containing all necessary data for a session.
 typedef struct session {
 	// === Event handlers ===
@@ -141,13 +149,10 @@ typedef struct session {
 	ev_timer fade_timer;
 	/// Timer for animations
 	ev_timer animation_timer;
-	/// Timer for delayed drawing, right now only used by
-	/// swopti
-	ev_timer delayed_draw_timer;
 	/// Use an ev_idle callback for drawing
 	/// So we only start drawing when events are processed
 	ev_idle draw_idle;
-	/// Called everytime we have timeouts or new data on socket,
+	/// Called every time we have timeouts or new data on socket,
 	/// so we can be sure if xcb read from X socket at anytime during event
 	/// handling, we will not left any event unhandled in the queue
 	ev_prepare event_check;
@@ -155,6 +160,8 @@ typedef struct session {
 	ev_signal usr1_signal;
 	/// Signal handler for SIGINT
 	ev_signal int_signal;
+
+	// === Backend related ===
 	/// backend data
 	backend_t *backend_data;
 	/// backend blur context
@@ -165,6 +172,8 @@ typedef struct session {
 	void *file_watch_handle;
 	/// libev mainloop
 	struct ev_loop *loop;
+	/// Shaders
+	struct shader_info *shaders;
 
 	// === Display related ===
 	/// Whether the X server is grabbed by us
@@ -191,9 +200,7 @@ typedef struct session {
 	int root_desktop_num;
 	/// Desktop switch direction
 	int root_desktop_switch_direction;
-	// Damage of root window.
-	// Damage root_damage;
-	/// X Composite overlay window. Used if <code>--paint-on-overlay</code>.
+	/// X Composite overlay window.
 	xcb_window_t overlay;
 	/// The target window for debug mode
 	xcb_window_t debug_window;
@@ -237,7 +244,7 @@ typedef struct session {
 	/// Whether we need to redraw the screen
 	bool redraw_needed;
 
-	/// Cache a xfixes region so we don't need to allocate it everytime.
+	/// Cache a xfixes region so we don't need to allocate it every time.
 	/// A workaround for yshui/picom#301
 	xcb_xfixes_region_t damaged_region;
 	/// The region needs to painted on next paint.
@@ -251,7 +258,7 @@ typedef struct session {
 	/// Pre-generated alpha pictures.
 	xcb_render_picture_t *alpha_picts;
 	/// Time of last fading. In milliseconds.
-	long fade_time;
+	long long fade_time;
 	/// Time of last window animation step. In milliseconds.
 	long animation_time;
 	/// Head pointer of the error ignore linked list.
@@ -299,17 +306,13 @@ typedef struct session {
 	xcb_render_picture_t cshadow_picture;
 	/// 1x1 white Picture.
 	xcb_render_picture_t white_picture;
-	/// Gaussian map of shadow.
-	struct conv *gaussian_map;
+	/// Backend shadow context.
+	struct backend_shadow_context *shadow_context;
 	// for shadow precomputation
 	/// A region in which shadow is not painted on.
 	region_t shadow_exclude_reg;
 
 	// === Software-optimization-related ===
-	/// Currently used refresh rate.
-	int refresh_rate;
-	/// Interval between refresh in nanoseconds.
-	long refresh_intv;
 	/// Nanosecond offset of the first painting.
 	long paint_tm_offset;
 

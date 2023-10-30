@@ -69,8 +69,6 @@
 		(session_t *)((char *)__mptr - offsetof(session_t, member));             \
 	})
 
-static const long SWOPTI_TOLERANCE = 3000;
-
 static bool must_use redirect_start(session_t *ps);
 
 static void unredirect(session_t *ps);
@@ -90,6 +88,7 @@ const char *const BACKEND_STRS[] = {[BKEND_XRENDER] = "xrender",
                                     [BKEND_GLX] = "glx",
                                     [BKEND_XR_GLX_HYBRID] = "xr_glx_hybrid",
                                     [BKEND_DUMMY] = "dummy",
+                                    [BKEND_EGL] = "egl",
                                     NULL};
 // clang-format on
 
@@ -433,6 +432,14 @@ static void destroy_backend(session_t *ps) {
 		free_paint(ps, &w->paint);
 	}
 
+	HASH_ITER2(ps->shaders, shader) {
+		if (shader->backend_shader != NULL) {
+			ps->backend_data->ops->destroy_shader(ps->backend_data,
+			                                      shader->backend_shader);
+			shader->backend_shader = NULL;
+		}
+	}
+
 	if (ps->backend_data && ps->root_image) {
 		ps->backend_data->ops->release_image(ps->backend_data, ps->root_image);
 		ps->root_image = NULL;
@@ -444,6 +451,11 @@ static void destroy_backend(session_t *ps) {
 			ps->backend_data->ops->destroy_blur_context(
 			    ps->backend_data, ps->backend_blur_context);
 			ps->backend_blur_context = NULL;
+		}
+		if (ps->shadow_context) {
+			ps->backend_data->ops->destroy_shadow_context(ps->backend_data,
+			                                              ps->shadow_context);
+			ps->shadow_context = NULL;
 		}
 		ps->backend_data->ops->deinit(ps->backend_data);
 		ps->backend_data = NULL;
@@ -487,7 +499,7 @@ static bool initialize_blur(session_t *ps) {
 
 /// Init the backend and bind all the window pixmap to backend images
 static bool initialize_backend(session_t *ps) {
-	if (ps->o.experimental_backends) {
+	if (!ps->o.legacy_backends) {
 		assert(!ps->backend_data);
 		// Reinitialize win_data
 		assert(backend_list[ps->o.backend]);
@@ -498,13 +510,38 @@ static bool initialize_backend(session_t *ps) {
 			return false;
 		}
 		ps->backend_data->ops = backend_list[ps->o.backend];
+		ps->shadow_context = ps->backend_data->ops->create_shadow_context(
+		    ps->backend_data, ps->o.shadow_radius);
+		if (!ps->shadow_context) {
+			log_fatal("Failed to initialize shadow context, aborting...");
+			goto err;
+		}
 
 		if (!initialize_blur(ps)) {
 			log_fatal("Failed to prepare for background blur, aborting...");
-			ps->backend_data->ops->deinit(ps->backend_data);
-			ps->backend_data = NULL;
-			quit(ps);
-			return false;
+			goto err;
+		}
+
+		// Create shaders
+		HASH_ITER2(ps->shaders, shader) {
+			assert(shader->backend_shader == NULL);
+			shader->backend_shader = ps->backend_data->ops->create_shader(
+			    ps->backend_data, shader->source);
+			if (shader->backend_shader == NULL) {
+				log_warn("Failed to create shader for shader file %s, "
+				         "this shader will not be used",
+				         shader->key);
+			} else {
+				if (ps->backend_data->ops->get_shader_attributes) {
+					shader->attributes =
+					    ps->backend_data->ops->get_shader_attributes(
+					        ps->backend_data, shader->backend_shader);
+				} else {
+					shader->attributes = 0;
+				}
+				log_debug("Shader %s has attributes %" PRIu64,
+				          shader->key, shader->attributes);
+			}
 		}
 
 		// window_stack shouldn't include window that's
@@ -527,6 +564,16 @@ static bool initialize_backend(session_t *ps) {
 
 	// The old backends binds pixmap lazily, nothing to do here
 	return true;
+err:
+	if (ps->shadow_context) {
+		ps->backend_data->ops->destroy_shadow_context(ps->backend_data,
+		                                              ps->shadow_context);
+		ps->shadow_context = NULL;
+	}
+	ps->backend_data->ops->deinit(ps->backend_data);
+	ps->backend_data = NULL;
+	quit(ps);
+	return false;
 }
 
 /// Handle configure event of the root window
@@ -541,7 +588,7 @@ static void configure_root(session_t *ps) {
 	bool has_root_change = false;
 	if (ps->redirected) {
 		// On root window changes
-		if (ps->o.experimental_backends) {
+		if (!ps->o.legacy_backends) {
 			assert(ps->backend_data);
 			has_root_change = ps->backend_data->ops->root_change != NULL;
 		} else {
@@ -585,7 +632,7 @@ static void configure_root(session_t *ps) {
 		ps->damage = ps->damage_ring + ps->ndamage - 1;
 #ifdef CONFIG_OPENGL
 		// GLX root change callback
-		if (BKEND_GLX == ps->o.backend && !ps->o.experimental_backends) {
+		if (BKEND_GLX == ps->o.backend && ps->o.legacy_backends) {
 			glx_on_root_change(ps);
 		}
 #endif
@@ -619,14 +666,6 @@ static void handle_root_flags(session_t *ps) {
 		if (ps->o.xinerama_shadow_crop) {
 			cxinerama_upd_scrs(ps);
 		}
-
-		if (ps->o.sw_opti && !ps->o.refresh_rate) {
-			update_refresh_rate(ps);
-			if (!ps->refresh_rate) {
-				log_warn("Refresh rate detection failed. swopti will be "
-				         "temporarily disabled");
-			}
-		}
 		ps->root_flags &= ~(uint64_t)ROOT_FLAGS_SCREEN_CHANGE;
 	}
 
@@ -639,8 +678,7 @@ static void handle_root_flags(session_t *ps) {
 static struct managed_win *
 paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 	// XXX need better, more general name for `fade_running`. It really
-	// means if fade is still ongoing after the current frame is rendered.
-	// Same goes for `animation_running`.
+	// means if fade is still ongoing after the current frame is rendered
 	struct managed_win *bottom = NULL;
 	*fade_running = false;
 	*animation_running = false;
@@ -670,7 +708,9 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 			animation_delta = min2(animation_delta, ps->o.animation_delta/1000);
 	}
 
-	// First, let's process fading
+	// First, let's process fading, and animated shaders
+	// TODO(yshui) check if a window is fully obscured, and if we don't need to
+	//             process fading or animation for it.
 	win_stack_foreach_managed_safe(w, &ps->window_stack) {
 		const winmode_t mode_old = w->mode;
 		const bool was_painted = w->to_paint;
@@ -850,39 +890,42 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 			add_damage_from_win(ps, w);
 		}
 
-		if (w->opacity != w->opacity_target) {
-			// Run fading
-			if (run_fade(ps, &w, steps)) {
-				*fade_running = true;
-			}
+		if (w->fg_shader && (w->fg_shader->attributes & SHADER_ATTRIBUTE_ANIMATED)) {
+			add_damage_from_win(ps, w);
+			*animation_running = true;
+		}
 
-			// Add window to damaged area if its opacity changes
-			// If was_painted == false, and to_paint is also false, we don't care
-			// If was_painted == false, but to_paint is true, damage will be added in
-			// the loop below
-			if (was_painted && w->opacity != opacity_old) {
-				add_damage_from_win(ps, w);
-			}
+		// Run fading
+		if (run_fade(ps, &w, steps)) {
+			*fade_running = true;
+		}
 
-			if (win_check_fade_finished(ps, w)) {
-				// the window has been destroyed because fading finished
-				continue;
-			}
+		// Add window to damaged area if its opacity changes
+		// If was_painted == false, and to_paint is also false, we don't care
+		// If was_painted == false, but to_paint is true, damage will be added in
+		// the loop below
+		if (was_painted && w->opacity != opacity_old) {
+			add_damage_from_win(ps, w);
+		}
 
-			if (win_has_frame(w)) {
-				w->frame_opacity = ps->o.frame_opacity;
-			} else {
-				w->frame_opacity = 1.0;
-			}
+		if (win_check_fade_finished(ps, w)) {
+			// the window has been destroyed because fading finished
+			continue;
+		}
 
-			// Update window mode
-			w->mode = win_calc_mode(w);
+		if (win_has_frame(w)) {
+			w->frame_opacity = ps->o.frame_opacity;
+		} else {
+			w->frame_opacity = 1.0;
+		}
 
-			// Destroy all reg_ignore above when frame opaque state changes on
-			// SOLID mode
-			if (was_painted && w->mode != mode_old) {
-				w->reg_ignore_valid = false;
-			}
+		// Update window mode
+		w->mode = win_calc_mode(w);
+
+		// Destroy all reg_ignore above when frame opaque state changes on
+		// SOLID mode
+		if (was_painted && w->mode != mode_old) {
+			w->reg_ignore_valid = false;
 		}
 	}
 
@@ -983,7 +1026,7 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 		// we add the window region to the ignored region
 		// Otherwise last_reg_ignore shouldn't change
 		if ((w->mode != WMODE_TRANS && !ps->o.force_win_blend) ||
-		    ps->o.transparent_clipping) {
+		    (ps->o.transparent_clipping && !w->transparent_clipping_excluded)) {
 			// w->mode == WMODE_SOLID or WMODE_FRAME_TRANS
 			region_t *tmp = rc_region_new();
 			if (w->mode == WMODE_SOLID) {
@@ -1098,9 +1141,13 @@ void root_damaged(session_t *ps) {
 		if (pixmap != XCB_NONE) {
 			ps->root_image = ps->backend_data->ops->bind_pixmap(
 			    ps->backend_data, pixmap, x_get_visual_info(ps->c, ps->vis), false);
-			ps->backend_data->ops->set_image_property(
-			    ps->backend_data, IMAGE_PROPERTY_EFFECTIVE_SIZE,
-			    ps->root_image, (int[]){ps->root_width, ps->root_height});
+			if (ps->root_image) {
+				ps->backend_data->ops->set_image_property(
+				    ps->backend_data, IMAGE_PROPERTY_EFFECTIVE_SIZE,
+				    ps->root_image, (int[]){ps->root_width, ps->root_height});
+			} else {
+				log_error("Failed to bind root back pixmap");
+			}
 		}
 	}
 
@@ -1240,7 +1287,7 @@ static int register_cm(session_t *ps) {
 	    ps->c, xcb_change_property_checked(
 	               ps->c, XCB_PROP_MODE_REPLACE, ps->reg_win,
 	               get_atom(ps->atoms, "COMPTON_VERSION"), XCB_ATOM_STRING, 8,
-	               (uint32_t)strlen(COMPTON_VERSION), COMPTON_VERSION));
+	               (uint32_t)strlen(PICOM_VERSION), PICOM_VERSION));
 	if (e) {
 		log_error_x_error(e, "Failed to set COMPTON_VERSION.");
 		free(e);
@@ -1292,77 +1339,6 @@ static inline bool write_pid(session_t *ps) {
 	fclose(f);
 
 	return true;
-}
-
-/**
- * Update refresh rate info with X Randr extension.
- */
-void update_refresh_rate(session_t *ps) {
-	xcb_randr_get_screen_info_reply_t *randr_info = xcb_randr_get_screen_info_reply(
-	    ps->c, xcb_randr_get_screen_info(ps->c, ps->root), NULL);
-
-	if (!randr_info)
-		return;
-	ps->refresh_rate = randr_info->rate;
-	free(randr_info);
-
-	if (ps->refresh_rate)
-		ps->refresh_intv = US_PER_SEC / ps->refresh_rate;
-	else
-		ps->refresh_intv = 0;
-}
-
-/**
- * Initialize refresh-rated based software optimization.
- *
- * @return true for success, false otherwise
- */
-static bool swopti_init(session_t *ps) {
-	log_warn("--sw-opti is going to be deprecated. If you get real benefits from "
-	         "using "
-	         "this option, please open an issue to let us know.");
-	// Prepare refresh rate
-	// Check if user provides one
-	ps->refresh_rate = ps->o.refresh_rate;
-	if (ps->refresh_rate)
-		ps->refresh_intv = US_PER_SEC / ps->refresh_rate;
-
-	// Auto-detect refresh rate otherwise
-	if (!ps->refresh_rate && ps->randr_exists) {
-		update_refresh_rate(ps);
-	}
-
-	// Turn off vsync_sw if we can't get the refresh rate
-	if (!ps->refresh_rate)
-		return false;
-
-	return true;
-}
-
-/**
- * Modify a struct timeval timeout value to render at a fixed pace.
- *
- * @param ps current session
- * @param[in,out] ptv pointer to the timeout
- */
-static double swopti_handle_timeout(session_t *ps) {
-	if (!ps->refresh_intv)
-		return 0;
-
-	// Get the microsecond offset of the time when the we reach the timeout
-	// I don't think a 32-bit long could overflow here.
-	long offset = (get_time_timeval().tv_usec - ps->paint_tm_offset) % ps->refresh_intv;
-	// XXX this formula dones't work if refresh rate is not a whole number
-	if (offset < 0)
-		offset += ps->refresh_intv;
-
-	// If the target time is sufficiently close to a refresh time, don't add
-	// an offset, to avoid certain blocking conditions.
-	if (offset < SWOPTI_TOLERANCE || offset > ps->refresh_intv - SWOPTI_TOLERANCE)
-		return 0;
-
-	// Add an offset so we wait until the next refresh after timeout
-	return (double)(ps->refresh_intv - offset) / 1e6;
 }
 
 /**
@@ -1456,10 +1432,10 @@ uint8_t session_redirection_mode(session_t *ps) {
 	if (ps->o.debug_mode) {
 		// If the backend is not rendering to the screen, we don't need to
 		// take over the screen.
-		assert(ps->o.experimental_backends);
+		assert(!ps->o.legacy_backends);
 		return XCB_COMPOSITE_REDIRECT_AUTOMATIC;
 	}
-	if (ps->o.experimental_backends && !backend_list[ps->o.backend]->present) {
+	if (!ps->o.legacy_backends && !backend_list[ps->o.backend]->present) {
 		// if the backend doesn't render anything, we don't need to take over the
 		// screen.
 		return XCB_COMPOSITE_REDIRECT_AUTOMATIC;
@@ -1496,7 +1472,7 @@ static bool redirect_start(session_t *ps) {
 		return false;
 	}
 
-	if (ps->o.experimental_backends) {
+	if (!ps->o.legacy_backends) {
 		assert(ps->backend_data);
 		ps->ndamage = ps->backend_data->ops->max_buffer_age;
 	} else {
@@ -1738,6 +1714,7 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		ev_timer_set(&ps->fade_timer, fade_timeout(ps), 0);
 		ev_timer_start(EV_A_ & ps->fade_timer);
 	}
+
 	// Start/stop animation timer depends on whether windows are animating
 	if (!animation_running && ev_is_active(&ps->animation_timer)) {
 		ev_timer_stop(EV_A_ & ps->animation_timer);
@@ -1751,7 +1728,7 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		static int paint = 0;
 
 		log_trace("Render start, frame %d", paint);
-		if (ps->o.experimental_backends) {
+		if (!ps->o.legacy_backends) {
 			paint_all_new(ps, bottom, false);
 		} else {
 			paint_all(ps, bottom, false);
@@ -1780,55 +1757,15 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 }
 
 static void draw_callback(EV_P_ ev_idle *w, int revents) {
-	// This function is not used if we are using --swopti
 	session_t *ps = session_ptr(w, draw_idle);
 
 	draw_callback_impl(EV_A_ ps, revents);
 
-	// Don't do painting non-stop unless we are in benchmark mode
-	if (!ps->o.benchmark) {
+	// Don't do painting non-stop unless we are in benchmark mode, or if
+	// draw_callback_impl thinks we should continue painting.
+	if (!ps->o.benchmark && !ps->redraw_needed) {
 		ev_idle_stop(EV_A_ & ps->draw_idle);
 	}
-}
-
-static void delayed_draw_timer_callback(EV_P_ ev_timer *w, int revents) {
-	session_t *ps = session_ptr(w, delayed_draw_timer);
-	draw_callback_impl(EV_A_ ps, revents);
-
-	// We might have stopped the ev_idle in delayed_draw_callback,
-	// so we restart it if we are in benchmark mode
-	if (ps->o.benchmark)
-		ev_idle_start(EV_A_ & ps->draw_idle);
-}
-
-static void delayed_draw_callback(EV_P_ ev_idle *w, int revents) {
-	// This function is only used if we are using --swopti
-	session_t *ps = session_ptr(w, draw_idle);
-	assert(ps->redraw_needed);
-	assert(!ev_is_active(&ps->delayed_draw_timer));
-
-	double delay = swopti_handle_timeout(ps);
-	if (delay < 1e-6) {
-		if (!ps->o.benchmark) {
-			ev_idle_stop(EV_A_ & ps->draw_idle);
-		}
-		return draw_callback_impl(EV_A_ ps, revents);
-	}
-
-	// This is a little bit hacky. When we get to this point in code, we need
-	// to update the screen , but we will only be updating after a delay, So
-	// we want to stop the ev_idle, so this callback doesn't get call repeatedly
-	// during the delay, we also want queue_redraw to not restart the ev_idle.
-	// So we stop ev_idle and leave ps->redraw_needed to be true. (effectively,
-	// ps->redraw_needed means if redraw is needed or if draw is in progress).
-	//
-	// We do this anyway even if we are in benchmark mode. That means we will
-	// have to restart draw_idle after the draw actually happened when we are in
-	// benchmark mode.
-	ev_idle_stop(EV_A_ & ps->draw_idle);
-
-	ev_timer_set(&ps->delayed_draw_timer, delay, 0);
-	ev_timer_start(EV_A_ & ps->delayed_draw_timer);
 }
 
 static void x_event_callback(EV_P attr_unused, ev_io *w, int revents attr_unused) {
@@ -1859,6 +1796,62 @@ static void exit_enable(EV_P attr_unused, ev_signal *w, int revents attr_unused)
 static void config_file_change_cb(void *_ps) {
 	auto ps = (struct session *)_ps;
 	reset_enable(ps->loop, NULL, 0);
+}
+
+static bool load_shader_source(session_t *ps, const char *path) {
+	if (!path) {
+		// Using the default shader.
+		return false;
+	}
+
+	log_info("Loading shader source from %s", path);
+
+	struct shader_info *shader = NULL;
+	HASH_FIND_STR(ps->shaders, path, shader);
+	if (shader) {
+		log_debug("Shader already loaded, reusing");
+		return false;
+	}
+
+	shader = ccalloc(1, struct shader_info);
+	shader->key = strdup(path);
+	HASH_ADD_KEYPTR(hh, ps->shaders, shader->key, strlen(shader->key), shader);
+
+	FILE *f = fopen(path, "r");
+	if (!f) {
+		log_error("Failed to open custom shader file: %s", path);
+		goto err;
+	}
+	struct stat statbuf;
+	if (fstat(fileno(f), &statbuf) < 0) {
+		log_error("Failed to access custom shader file: %s", path);
+		goto err;
+	}
+
+	auto num_bytes = (size_t)statbuf.st_size;
+	shader->source = ccalloc(num_bytes + 1, char);
+	auto read_bytes = fread(shader->source, sizeof(char), num_bytes, f);
+	if (read_bytes < num_bytes || ferror(f)) {
+		// This is a difficult to hit error case, review thoroughly.
+		log_error("Failed to read custom shader at %s. (read %lu bytes, expected "
+		          "%lu bytes)",
+		          path, read_bytes, num_bytes);
+		goto err;
+	}
+	return false;
+err:
+	HASH_DEL(ps->shaders, shader);
+	if (f) {
+		fclose(f);
+	}
+	free(shader->source);
+	free(shader->key);
+	free(shader);
+	return true;
+}
+
+static bool load_shader_source_for_condition(const c2_lptr_t *cond, void *data) {
+	return load_shader_source(data, c2_list_get_data(cond));
 }
 
 /**
@@ -1912,11 +1905,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	    .black_picture = XCB_NONE,
 	    .cshadow_picture = XCB_NONE,
 	    .white_picture = XCB_NONE,
-	    .gaussian_map = NULL,
-
-	    .refresh_rate = 0,
-	    .refresh_intv = 0UL,
-	    .paint_tm_offset = 0L,
+	    .shadow_context = NULL,
 
 #ifdef CONFIG_VSYNC_DRM
 	    .drm_fd = -1,
@@ -2093,6 +2082,10 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 		return NULL;
 	}
 
+	if (ps->o.window_shader_fg) {
+		log_debug("Default window shader: \"%s\"", ps->o.window_shader_fg);
+	}
+
 	if (ps->o.logpath) {
 		auto l = file_logger_new(ps->o.logpath);
 		if (l) {
@@ -2142,9 +2135,11 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	      c2_list_postprocess(ps, ps->o.fade_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.blur_background_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.invert_color_list) &&
+	      c2_list_postprocess(ps, ps->o.window_shader_fg_rules) &&
 	      c2_list_postprocess(ps, ps->o.opacity_rules) &&
-	      c2_list_postprocess(ps, ps->o.corner_rules) &&
 	      c2_list_postprocess(ps, ps->o.rounded_corners_blacklist) &&
+	      c2_list_postprocess(ps, ps->o.corner_rules) &&
+	      c2_list_postprocess(ps, ps->o.blur_rules) &&
 	      c2_list_postprocess(ps, ps->o.animation_open_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.animation_unmap_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.focus_blacklist))) {
@@ -2152,8 +2147,27 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 		          "might not work");
 	}
 
-	ps->gaussian_map = gaussian_kernel_autodetect_deviation(ps->o.shadow_radius);
-	sum_kernel_preprocess(ps->gaussian_map);
+	// Load shader source file specified in the shader rules
+	if (c2_list_foreach(ps->o.window_shader_fg_rules, load_shader_source_for_condition, ps)) {
+		log_error("Failed to load shader source file for some of the window "
+		          "shader rules");
+	}
+	if (load_shader_source(ps, ps->o.window_shader_fg)) {
+		log_error("Failed to load window shader source file");
+	}
+
+	if (log_get_level_tls() <= LOG_LEVEL_DEBUG) {
+		HASH_ITER2(ps->shaders, shader) {
+			log_debug("Shader %s:", shader->key);
+			log_debug("%s", shader->source);
+		}
+	}
+
+	if (ps->o.legacy_backends) {
+		ps->shadow_context =
+		    (void *)gaussian_kernel_autodetect_deviation(ps->o.shadow_radius);
+		sum_kernel_preprocess((conv *)ps->shadow_context);
+	}
 
 	rebuild_shadow_exclude_reg(ps);
 
@@ -2224,11 +2238,10 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	}
 
 	// Query X RandR
-	if ((ps->o.sw_opti && !ps->o.refresh_rate) || ps->o.xinerama_shadow_crop) {
+	if (ps->o.xinerama_shadow_crop) {
 		if (!ps->randr_exists) {
-			log_fatal("No XRandR extension. sw-opti, refresh-rate or "
-			          "xinerama-shadow-crop "
-			          "cannot be enabled.");
+			log_fatal("No XRandR extension. xinerama-shadow-crop cannot be "
+			          "enabled.");
 			goto err;
 		}
 	}
@@ -2280,7 +2293,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 
 		// The old backends doesn't have a automatic redirection mode
 		log_info("The compositor is started in automatic redirection mode.");
-		assert(ps->o.experimental_backends);
+		assert(!ps->o.legacy_backends);
 
 		if (backend_list[ps->o.backend]->present) {
 			// If the backend has `present`, we couldn't be in automatic
@@ -2296,7 +2309,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	apply_driver_workarounds(ps, ps->drivers);
 
 	// Initialize filters, must be preceded by OpenGL context creation
-	if (!ps->o.experimental_backends && !init_render(ps)) {
+	if (ps->o.legacy_backends && !init_render(ps)) {
 		log_fatal("Failed to initialize the backend");
 		exit(1);
 	}
@@ -2314,7 +2327,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 
 	free(config_file_to_free);
 
-	if (bkend_use_glx(ps) && !ps->o.experimental_backends) {
+	if (bkend_use_glx(ps) && ps->o.legacy_backends) {
 		auto gl_logger = gl_string_marker_logger_new();
 		if (gl_logger) {
 			log_info("Enabling gl string marker");
@@ -2322,7 +2335,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 		}
 	}
 
-	if (ps->o.experimental_backends) {
+	if (!ps->o.legacy_backends) {
 		if (ps->o.monitor_repaint && !backend_list[ps->o.backend]->fill) {
 			log_warn("--monitor-repaint is not supported by the backend, "
 			         "disabling");
@@ -2330,15 +2343,11 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 		}
 	}
 
-	// Initialize software optimization
-	if (ps->o.sw_opti)
-		ps->o.sw_opti = swopti_init(ps);
-
 	// Monitor screen changes if vsync_sw is enabled and we are using
 	// an auto-detected refresh rate, or when Xinerama features are enabled
-	if (ps->randr_exists &&
-	    ((ps->o.sw_opti && !ps->o.refresh_rate) || ps->o.xinerama_shadow_crop))
+	if (ps->randr_exists && ps->o.xinerama_shadow_crop) {
 		xcb_randr_select_input(ps->c, ps->root, XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE);
+	}
 
 	cxinerama_upd_scrs(ps);
 
@@ -2359,14 +2368,10 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	ev_io_init(&ps->xiow, x_event_callback, ConnectionNumber(ps->dpy), EV_READ);
 	ev_io_start(ps->loop, &ps->xiow);
 	ev_init(&ps->unredir_timer, tmout_unredir_callback);
-	if (ps->o.sw_opti)
-		ev_idle_init(&ps->draw_idle, delayed_draw_callback);
-	else
-		ev_idle_init(&ps->draw_idle, draw_callback);
+	ev_idle_init(&ps->draw_idle, draw_callback);
 
 	ev_init(&ps->fade_timer, fade_timer_callback);
 	ev_init(&ps->animation_timer, animation_timer_callback);
-	ev_init(&ps->delayed_draw_timer, delayed_draw_timer_callback);
 
 	// Set up SIGUSR1 signal handler to reset program
 	ev_signal_init(&ps->usr1_signal, reset_enable, SIGUSR1);
@@ -2517,19 +2522,21 @@ static void session_destroy(session_t *ps) {
 	list_init_head(&ps->window_stack);
 
 	// Free blacklists
-	free_wincondlst(&ps->o.shadow_blacklist);
-	free_wincondlst(&ps->o.shadow_clip_list);
-	free_wincondlst(&ps->o.fade_blacklist);
-	free_wincondlst(&ps->o.focus_blacklist);
-	free_wincondlst(&ps->o.invert_color_list);
-	free_wincondlst(&ps->o.blur_background_blacklist);
-	free_wincondlst(&ps->o.opacity_rules);
-	free_wincondlst(&ps->o.corner_rules);
-	free_wincondlst(&ps->o.paint_blacklist);
-	free_wincondlst(&ps->o.unredir_if_possible_blacklist);
-	free_wincondlst(&ps->o.rounded_corners_blacklist);
-	free_wincondlst(&ps->o.animation_open_blacklist);
-	free_wincondlst(&ps->o.animation_unmap_blacklist);
+	c2_list_free(&ps->o.shadow_blacklist, NULL);
+	c2_list_free(&ps->o.shadow_clip_list, NULL);
+	c2_list_free(&ps->o.fade_blacklist, NULL);
+	c2_list_free(&ps->o.focus_blacklist, NULL);
+	c2_list_free(&ps->o.invert_color_list, NULL);
+	c2_list_free(&ps->o.blur_background_blacklist, NULL);
+	c2_list_free(&ps->o.opacity_rules, NULL);
+	c2_list_free(&ps->o.paint_blacklist, NULL);
+	c2_list_free(&ps->o.unredir_if_possible_blacklist, NULL);
+	c2_list_free(&ps->o.rounded_corners_blacklist, NULL);
+	c2_list_free(&ps->o.corner_rules, NULL);
+	c2_list_free(&ps->o.blur_rules, NULL);
+	c2_list_free(&ps->o.animation_open_blacklist, NULL);
+	c2_list_free(&ps->o.animation_unmap_blacklist, NULL);
+	c2_list_free(&ps->o.window_shader_fg_rules, free);
 
 	// Free tracked atom list
 	{
@@ -2580,6 +2587,17 @@ static void session_destroy(session_t *ps) {
 	free(ps->o.glx_fshader_win_str);
 	free_xinerama_info(ps);
 
+	// Release custom window shaders
+	free(ps->o.window_shader_fg);
+	struct shader_info *shader, *tmp;
+	HASH_ITER(hh, ps->shaders, shader, tmp) {
+		HASH_DEL(ps->shaders, shader);
+		assert(shader->backend_shader == NULL);
+		free(shader->source);
+		free(shader->key);
+		free(shader);
+	}
+
 #ifdef CONFIG_VSYNC_DRM
 	// Close file opened for DRM VSync
 	if (ps->drm_fd >= 0) {
@@ -2615,7 +2633,7 @@ static void session_destroy(session_t *ps) {
 		ps->damaged_region = XCB_NONE;
 	}
 
-	if (ps->o.experimental_backends) {
+	if (!ps->o.legacy_backends) {
 		// backend is deinitialized in unredirect()
 		assert(ps->backend_data == NULL);
 	} else {
@@ -2632,7 +2650,9 @@ static void session_destroy(session_t *ps) {
 	// Flush all events
 	x_sync(ps->c);
 	ev_io_stop(ps->loop, &ps->xiow);
-	free_conv(ps->gaussian_map);
+	if (ps->o.legacy_backends) {
+		free_conv((conv *)ps->shadow_context);
+	}
 	destroy_atoms(ps->atoms);
 
 #ifdef DEBUG_XRC
@@ -2658,9 +2678,6 @@ static void session_destroy(session_t *ps) {
  * @param ps current session
  */
 static void session_run(session_t *ps) {
-	if (ps->o.sw_opti)
-		ps->paint_tm_offset = get_time_timeval().tv_usec;
-
 	// In benchmark mode, we want draw_idle handler to always be active
 	if (ps->o.benchmark) {
 		ev_idle_start(ps->loop, &ps->draw_idle);

@@ -85,6 +85,12 @@
 # define fallthrough()
 #endif
 
+#if __has_attribute(cleanup)
+# define cleanup(func) __attribute__((cleanup(func)))
+#else
+# error "Compiler is missing cleanup attribute"
+#endif
+
 #if __STDC_VERSION__ >= 201112L
 # define attr_noret _Noreturn
 #else
@@ -102,7 +108,7 @@
 #endif
 
 #ifndef __has_include
-# define __has_include(x) 0
+#define __has_include(x) 0
 #endif
 
 #if !defined(__STDC_NO_THREADS__) && __has_include(<threads.h>)

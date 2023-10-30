@@ -579,8 +579,8 @@ static int c2_parse_target(const char *pattern, int offset, c2_ptr_t *presult) {
 
 	// Copy target name out
 	int tgtlen = 0;
-	for (; pattern[offset] &&
-	       (isalnum((unsigned char)pattern[offset]) || '_' == pattern[offset]);
+	for (; pattern[offset] && (isalnum((unsigned char)pattern[offset]) ||
+	                           '_' == pattern[offset] || '.' == pattern[offset]);
 	     ++offset) {
 		++tgtlen;
 	}
@@ -852,6 +852,10 @@ static int c2_parse_pattern(const char *pattern, int offset, c2_ptr_t *presult) 
 			C2H_SKIP_SPACES();
 		}
 
+		if (raw == true) {
+			log_warn("Raw string patterns has been deprecated. pos %d", offset);
+		}
+
 		// Check for delimiters
 		if (pattern[offset] == '\"' || pattern[offset] == '\'') {
 			pleaf->ptntype = C2_L_PTSTRING;
@@ -886,11 +890,10 @@ static int c2_parse_pattern(const char *pattern, int offset, c2_ptr_t *presult) 
 				case 'v': *(ptptnstr++) = '\v'; break;
 				case 'o':
 				case 'x': {
-					char *tstr = strndup(pattern + offset + 1, 2);
+					scoped_charp tstr = strndup(pattern + offset + 1, 2);
 					char *pstr = NULL;
 					long val = strtol(
 					    tstr, &pstr, ('o' == pattern[offset] ? 8 : 16));
-					free(tstr);
 					if (pstr != &tstr[2] || val <= 0)
 						c2_error("Invalid octal/hex escape "
 						         "sequence.");
@@ -1148,11 +1151,16 @@ static void c2_free(c2_ptr_t p) {
 /**
  * Free a condition tree in c2_lptr_t.
  */
-c2_lptr_t *c2_free_lptr(c2_lptr_t *lp) {
-	if (!lp)
+c2_lptr_t *c2_free_lptr(c2_lptr_t *lp, c2_userdata_free f) {
+	if (!lp) {
 		return NULL;
+	}
 
 	c2_lptr_t *pnext = lp->next;
+	if (f) {
+		f(lp->data);
+	}
+	lp->data = NULL;
 	c2_free(lp->ptr);
 	free(lp);
 
@@ -1324,13 +1332,13 @@ static inline void c2_match_once_leaf(session_t *ps, const struct managed_win *w
 	switch (pleaf->ptntype) {
 	// Deal with integer patterns
 	case C2_L_PTINT: {
-		long *targets = NULL;
-		long *targets_free = NULL;
+		long long *targets = NULL;
+		long long *targets_free = NULL;
 		size_t ntargets = 0;
 
 		// Get the value
 		// A predefined target
-		long predef_target = 0;
+		long long predef_target = 0;
 		if (pleaf->predef != C2_L_PUNDEFINED) {
 			*perr = false;
 			switch (pleaf->predef) {
@@ -1379,7 +1387,7 @@ static inline void c2_match_once_leaf(session_t *ps, const struct managed_win *w
 
 			ntargets = (pleaf->index < 0 ? prop.nitems : min2(prop.nitems, 1));
 			if (ntargets > 0) {
-				targets = targets_free = ccalloc(ntargets, long);
+				targets = targets_free = ccalloc(ntargets, long long);
 				*perr = false;
 				for (size_t i = 0; i < ntargets; ++i) {
 					targets[i] = winprop_get_int(prop, i);
@@ -1395,7 +1403,7 @@ static inline void c2_match_once_leaf(session_t *ps, const struct managed_win *w
 		// Do comparison
 		bool res = false;
 		for (size_t i = 0; i < ntargets; ++i) {
-			long tgt = targets[i];
+			long long tgt = targets[i];
 			switch (pleaf->op) {
 			case C2_L_OEXISTS:
 				res = (pleaf->predef != C2_L_PUNDEFINED ? tgt : true);
@@ -1671,4 +1679,22 @@ bool c2_match(session_t *ps, const struct managed_win *w, const c2_lptr_t *condl
 	}
 
 	return false;
+}
+
+/// Iterate over all conditions in a condition linked list. Call the callback for each of
+/// the conditions. If the callback returns true, the iteration stops early.
+///
+/// Returns whether the iteration was stopped early.
+bool c2_list_foreach(const c2_lptr_t *condlist, c2_list_foreach_cb_t cb, void *data) {
+	for (auto i = condlist; i; i = i->next) {
+		if (cb(i, data)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/// Return user data stored in a condition.
+void *c2_list_get_data(const c2_lptr_t *condlist) {
+	return condlist->data;
 }

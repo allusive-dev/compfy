@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2012-2014 Richard Grenville <pyxlcy@gmail.com>
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,102 +31,11 @@ static inline int lcfg_lookup_bool(const config_t *config, const char *path, boo
 	int ival;
 
 	int ret = config_lookup_bool(config, path, &ival);
-	if (ret)
+	if (ret) {
 		*value = ival;
+	}
 
 	return ret;
-}
-
-const char *xdg_config_home(void) {
-	char *xdgh = getenv("XDG_CONFIG_HOME");
-	char *home = getenv("HOME");
-	const char *default_dir = "/.config";
-
-	if (!xdgh) {
-		if (!home) {
-			return NULL;
-		}
-
-		xdgh = cvalloc(strlen(home) + strlen(default_dir) + 1);
-
-		strcpy(xdgh, home);
-		strcat(xdgh, default_dir);
-	} else {
-		xdgh = strdup(xdgh);
-	}
-
-	return xdgh;
-}
-
-char **xdg_config_dirs(void) {
-	char *xdgd = getenv("XDG_CONFIG_DIRS");
-	size_t count = 0;
-
-	if (!xdgd) {
-		xdgd = "/etc/xdg";
-	}
-
-	for (int i = 0; xdgd[i]; i++) {
-		if (xdgd[i] == ':') {
-			count++;
-		}
-	}
-
-	// Store the string and the result pointers together so they can be
-	// freed together
-	char **dir_list = cvalloc(sizeof(char *) * (count + 2) + strlen(xdgd) + 1);
-	auto dirs = strcpy((char *)dir_list + sizeof(char *) * (count + 2), xdgd);
-	auto path = dirs;
-
-	for (size_t i = 0; i < count; i++) {
-		dir_list[i] = path;
-		path = strchr(path, ':');
-		*path = '\0';
-		path++;
-	}
-	dir_list[count] = path;
-
-	size_t fill = 0;
-	for (size_t i = 0; i <= count; i++) {
-		if (dir_list[i][0] == '/') {
-			dir_list[fill] = dir_list[i];
-			fill++;
-		}
-	}
-
-	dir_list[fill] = NULL;
-
-	return dir_list;
-}
-
-TEST_CASE(xdg_config_dirs) {
-	auto old_var = getenv("XDG_CONFIG_DIRS");
-	if (old_var) {
-		old_var = strdup(old_var);
-	}
-	unsetenv("XDG_CONFIG_DIRS");
-
-	auto result = xdg_config_dirs();
-	TEST_STREQUAL(result[0], "/etc/xdg");
-	TEST_EQUAL(result[1], NULL);
-	free(result);
-
-	setenv("XDG_CONFIG_DIRS", ".:.:/etc/xdg:.:/:", 1);
-	result = xdg_config_dirs();
-	TEST_STREQUAL(result[0], "/etc/xdg");
-	TEST_STREQUAL(result[1], "/");
-	TEST_EQUAL(result[2], NULL);
-	free(result);
-
-	setenv("XDG_CONFIG_DIRS", ":", 1);
-	result = xdg_config_dirs();
-	TEST_EQUAL(result[0], NULL);
-	free(result);
-
-	if (old_var) {
-		setenv("XDG_CONFIG_DIRS", old_var, 1);
-		free(old_var);
-	}
 }
 
 /// Search for config file under a base directory
@@ -275,6 +185,36 @@ parse_cfg_condlst_corner(options_t *opt, const config_t *pcfg, const char *name)
 	}
 }
 
+/**
+ * Parse a window shader rule list in configuration file.
+ */
+static inline void parse_cfg_condlst_shader(options_t *opt, const config_t *pcfg,
+                                            const char *name, const char *include_dir) {
+	config_setting_t *setting = config_lookup(pcfg, name);
+	if (setting) {
+		// Parse an array of options
+		if (config_setting_is_array(setting)) {
+			int i = config_setting_length(setting);
+			while (i--) {
+				if (!parse_rule_window_shader(
+				        &opt->window_shader_fg_rules,
+				        config_setting_get_string_elem(setting, i),
+				        include_dir)) {
+					exit(1);
+				}
+			}
+		}
+		// Treat it as a single pattern if it's a string
+		else if (config_setting_type(setting) == CONFIG_TYPE_STRING) {
+			if (!parse_rule_window_shader(&opt->window_shader_fg_rules,
+			                              config_setting_get_string(setting),
+			                              include_dir)) {
+				exit(1);
+			}
+		}
+	}
+}
+
 static inline void parse_wintype_config(const config_t *cfg, const char *member_name,
                                         win_option_t *o, win_option_mask_t *mask) {
 	char *str = mstrjoin("wintypes.", member_name);
@@ -283,7 +223,7 @@ static inline void parse_wintype_config(const config_t *cfg, const char *member_
 
 	int ival = 0;
 	const char *sval = NULL;
-
+	
 	if (setting) {
 		if (config_setting_lookup_bool(setting, "shadow", &ival)) {
 			o->shadow = ival;
@@ -362,6 +302,11 @@ static inline void parse_wintype_config(const config_t *cfg, const char *member_
 char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shadow_enable,
                              bool *fading_enable, bool *conv_kern_hasneg,
                              win_option_mask_t *winopt_mask) {
+
+	const char *deprecation_message =
+	    "option has been deprecated. Please remove it from your configuration file. "
+	    "If you encounter any problems without this feature, please feel free to "
+	    "open a bug report";
 	char *path = NULL;
 	FILE *f;
 	config_t cfg;
@@ -387,15 +332,14 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	config_set_options(&cfg, CONFIG_OPTION_ALLOW_OVERRIDES);
 #endif
 	{
-		// dirname() could modify the original string, thus we must pass a
-		// copy
-		char *path2 = strdup(path);
-		char *parent = dirname(path2);
+		char *abspath = realpath(path, NULL);
+		char *parent = dirname(abspath);        // path2 may be modified
 
-		if (parent)
+		if (parent) {
 			config_set_include_dir(&cfg, parent);
+		}
 
-		free(path2);
+		free(abspath);
 	}
 
 	{
@@ -414,15 +358,21 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	// Get options from the configuration file. We don't do range checking
 	// right now. It will be done later
 
+	// --dbus
+	lcfg_lookup_bool(&cfg, "dbus", &opt->dbus);
+
 	// -D (fade_delta)
-	if (config_lookup_int(&cfg, "fade-delta", &ival))
+	if (config_lookup_int(&cfg, "fade-delta", &ival)) {
 		opt->fade_delta = ival;
+	}
 	// -I (fade_in_step)
-	if (config_lookup_float(&cfg, "fade-in-step", &dval))
+	if (config_lookup_float(&cfg, "fade-in-step", &dval)) {
 		opt->fade_in_step = normalize_d(dval);
+	}
 	// -O (fade_out_step)
-	if (config_lookup_float(&cfg, "fade-out-step", &dval))
+	if (config_lookup_float(&cfg, "fade-out-step", &dval)) {
 		opt->fade_out_step = normalize_d(dval);
+	}
 	// -r (shadow_radius)
 	config_lookup_int(&cfg, "shadow-radius", &opt->shadow_radius);
 	// -o (shadow_opacity)
@@ -432,11 +382,13 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	// -t (shadow_offset_y)
 	config_lookup_int(&cfg, "shadow-offset-y", &opt->shadow_offset_y);
 	// -i (inactive_opacity)
-	if (config_lookup_float(&cfg, "inactive-opacity", &dval))
+	if (config_lookup_float(&cfg, "inactive-opacity", &dval)) {
 		opt->inactive_opacity = normalize_d(dval);
+	}
 	// --active_opacity
-	if (config_lookup_float(&cfg, "active-opacity", &dval))
+	if (config_lookup_float(&cfg, "active-opacity", &dval)) {
 		opt->active_opacity = normalize_d(dval);
+	}
 	// --corner-radius
 	config_lookup_int(&cfg, "corner-radius", &opt->corner_radius);
 	// --rounded-corners-exclude
@@ -444,26 +396,12 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	// -e (frame_opacity)
 	config_lookup_float(&cfg, "frame-opacity", &opt->frame_opacity);
 	// -c (shadow_enable)
-	if (config_lookup_bool(&cfg, "shadow", &ival))
-		*shadow_enable = ival;
-	// -C (no_dock_shadow)
-	if (config_lookup_bool(&cfg, "no-dock-shadow", &ival)) {
-		log_error("Option `no-dock-shadow` has been removed. Please use the "
-		          "wintype option `shadow` of `dock` instead.");
-		goto err;
-	}
-	// -G (no_dnd_shadow)
-	if (config_lookup_bool(&cfg, "no-dnd-shadow", &ival)) {
-		log_error("Option `no-dnd-shadow` has been removed. Please use the "
-		          "wintype option `shadow` of `dnd` instead.");
-		goto err;
-	};
+	lcfg_lookup_bool(&cfg, "shadow", shadow_enable);
 	// -m (menu_opacity)
 	if (config_lookup_float(&cfg, "menu-opacity", &dval)) {
-		log_warn("Option `menu-opacity` is deprecated, and will be "
-		         "removed.Please use the "
-		         "wintype option `opacity` of `popup_menu` and `dropdown_menu` "
-		         "instead.");
+		log_warn("Option `menu-opacity` is deprecated, and will be removed."
+		         "Please use the wintype option `opacity` of `popup_menu`"
+		         "and `dropdown_menu` instead.");
 		opt->wintype_option[WINTYPE_DROPDOWN_MENU].opacity = dval;
 		opt->wintype_option[WINTYPE_POPUP_MENU].opacity = dval;
 		winopt_mask[WINTYPE_DROPDOWN_MENU].opacity = true;
@@ -510,19 +448,16 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	// --detect-client-opacity
 	lcfg_lookup_bool(&cfg, "detect-client-opacity", &opt->detect_client_opacity);
 	// --refresh-rate
-	if (config_lookup_int(&cfg, "refresh-rate", &opt->refresh_rate)) {
-		if (opt->refresh_rate < 0) {
-			log_warn("Invalid refresh rate %d, fallback to 0", opt->refresh_rate);
-			opt->refresh_rate = 0;
-		}
+	if (config_lookup_int(&cfg, "refresh-rate", &ival)) {
+		log_warn("The refresh-rate %s", deprecation_message);
 	}
 	// --vsync
 	if (config_lookup_string(&cfg, "vsync", &sval)) {
-		opt->vsync = parse_vsync(sval);
-		log_warn("vsync option will take a boolean from now on. \"%s\" is "
-		         "interpreted as \"%s\" for compatibility, but this will stop "
-		         "working soon",
-		         sval, opt->vsync ? "true" : "false");
+		bool parsed_vsync = parse_vsync(sval);
+		log_error("vsync option will take a boolean from now on. \"%s\" in "
+		          "your configuration should be changed to \"%s\"",
+		          sval, parsed_vsync ? "true" : "false");
+		goto err;
 	}
 	lcfg_lookup_bool(&cfg, "vsync", &opt->vsync);
 	// --backend
@@ -551,7 +486,9 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		opt->logpath = strdup(sval);
 	}
 	// --sw-opti
-	lcfg_lookup_bool(&cfg, "sw-opti", &opt->sw_opti);
+	if (lcfg_lookup_bool(&cfg, "sw-opti", &bval)) {
+		log_warn("The sw-opti %s", deprecation_message);
+	}
 	// --use-ewmh-active-win
 	lcfg_lookup_bool(&cfg, "use-ewmh-active-win", &opt->use_ewmh_active_win);
 	// --unredir-if-possible
@@ -574,6 +511,9 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	lcfg_lookup_bool(&cfg, "no-ewmh-fullscreen", &opt->no_ewmh_fullscreen);
 	// --transparent-clipping
 	lcfg_lookup_bool(&cfg, "transparent-clipping", &opt->transparent_clipping);
+	// --transparent-clipping-exclude
+	parse_cfg_condlst(&cfg, &opt->transparent_clipping_blacklist,
+	                  "transparent-clipping-exclude");
 	// --shadow-exclude
 	parse_cfg_condlst(&cfg, &opt->shadow_blacklist, "shadow-exclude");
 	// --clip-shadow-above
@@ -641,16 +581,18 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	lcfg_lookup_bool(&cfg, "animation-clamping", &opt->animation_clamping);
 	// --focus-exclude
 	parse_cfg_condlst(&cfg, &opt->focus_blacklist, "focus-exclude");
-	// animation exclude
-	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
-	// animation exclude
-	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
-	// --corners-rule
-	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
 	// --invert-color-include
 	parse_cfg_condlst(&cfg, &opt->invert_color_list, "invert-color-include");
 	// --blur-background-exclude
 	parse_cfg_condlst(&cfg, &opt->blur_background_blacklist, "blur-background-exclude");
+	// animation exclude
+	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
+	// animation exclude
+	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
+	// corners-rule
+	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
+	// blur-rule
+	parse_cfg_condlst(&cfg, &opt->blur_rules, "blur-rule");
 	// --opacity-rule
 	parse_cfg_condlst_opct(opt, &cfg, "opacity-rule");
 	// --unredir-if-possible-exclude
@@ -701,6 +643,7 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	if (config_lookup_string(&cfg, "glx-swap-method", &sval)) {
 		char *endptr;
 		long val = strtol(sval, &endptr, 10);
+		bool should_remove = true;
 		if (*endptr || !(*sval)) {
 			// sval is not a number, or an empty string
 			val = -1;
@@ -708,12 +651,13 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		if (strcmp(sval, "undefined") != 0 && val != 0) {
 			// If not undefined, we will use damage and buffer-age to limit
 			// the rendering area.
-			opt->use_damage = true;
+			should_remove = false;
 		}
-		log_warn("glx-swap-method has been deprecated since v6, your setting "
-		         "\"%s\" should be %s.",
-		         sval,
-		         opt->use_damage ? "replaced by `use-damage = true`" : "removed");
+		log_error("glx-swap-method has been removed, your setting "
+		          "\"%s\" should be %s.",
+		          sval,
+		          !should_remove ? "replaced by `use-damage = true`" : "removed");
+		goto err;
 	}
 	// --use-damage
 	lcfg_lookup_bool(&cfg, "use-damage", &opt->use_damage);
@@ -726,15 +670,20 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		opt->max_brightness = 1.0;
 	}
 
-	// --glx-use-gpushader4
-	if (config_lookup_bool(&cfg, "glx-use-gpushader4", &ival) && ival) {
-		log_warn("glx-use-gpushader4 is deprecated since v6, please remove it "
-		         "from"
-		         "your config file");
+	// --window-shader-fg
+	if (config_lookup_string(&cfg, "window-shader-fg", &sval)) {
+		opt->window_shader_fg =
+		    locate_auxiliary_file("shaders", sval, config_get_include_dir(&cfg));
 	}
-	// --xrender-sync
-	if (config_lookup_bool(&cfg, "xrender-sync", &ival) && ival) {
-		log_error("Please use xrender-sync-fence instead of xrender-sync.");
+
+	// --window-shader-fg-rule
+	parse_cfg_condlst_shader(opt, &cfg, "window-shader-fg-rule",
+	                         config_get_include_dir(&cfg));
+
+	// --glx-use-gpushader4
+	if (config_lookup_bool(&cfg, "glx-use-gpushader4", &ival)) {
+		log_error("glx-use-gpushader4 has been removed, please remove it "
+		          "from your config file");
 		goto err;
 	}
 	// --xrender-sync-fence
@@ -743,21 +692,6 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	if (lcfg_lookup_bool(&cfg, "clear-shadow", &bval))
 		log_warn("\"clear-shadow\" is removed as an option, and is always"
 		         " enabled now. Consider removing it from your config file");
-	if (lcfg_lookup_bool(&cfg, "paint-on-overlay", &bval)) {
-		log_error("\"paint-on-overlay\" has been removed as an option, and "
-		          "the feature is enabled whenever possible");
-		goto err;
-	}
-
-	if (config_lookup_float(&cfg, "alpha-step", &dval)) {
-		log_error("\"alpha-step\" has been removed, compton now tries to make use"
-		          " of all alpha values");
-		goto err;
-	}
-
-	const char *deprecation_message attr_unused =
-	    "has been removed. If you encounter problems "
-	    "without this feature, please feel free to open a bug report";
 
 	config_setting_t *blur_cfg = config_lookup(&cfg, "blur");
 	if (blur_cfg) {

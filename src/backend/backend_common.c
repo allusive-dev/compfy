@@ -92,7 +92,7 @@ make_shadow(xcb_connection_t *c, const conv *kernel, double opacity, int width, 
 	}
 
 	unsigned char *data = ximage->data;
-	long sstride = ximage->stride;
+	long long sstride = ximage->stride;
 
 	// If the window body is smaller than the kernel, we do convolution directly
 	if (width < r * 2 && height < r * 2) {
@@ -100,7 +100,7 @@ make_shadow(xcb_connection_t *c, const conv *kernel, double opacity, int width, 
 			for (int x = 0; x < swidth; x++) {
 				double sum = sum_kernel_normalized(
 				    kernel, d - x - 1, d - y - 1, width, height);
-				data[y * sstride + x] = (uint8_t)(sum * 255.0);
+				data[y * sstride + x] = (uint8_t)(sum * 255.0 * opacity);
 			}
 		}
 		return ximage;
@@ -118,14 +118,14 @@ make_shadow(xcb_connection_t *c, const conv *kernel, double opacity, int width, 
 			for (int x = 0; x < r * 2; x++) {
 				double sum = sum_kernel_normalized(kernel, d - x - 1,
 				                                   d - y - 1, d, height) *
-				             255.0;
+				             255.0 * opacity;
 				data[y * sstride + x] = (uint8_t)sum;
 				data[y * sstride + swidth - x - 1] = (uint8_t)sum;
 			}
 		}
 		for (int y = 0; y < sheight; y++) {
-			double sum =
-			    sum_kernel_normalized(kernel, 0, d - y - 1, d, height) * 255.0;
+			double sum = sum_kernel_normalized(kernel, 0, d - y - 1, d, height) *
+			             255.0 * opacity;
 			memset(&data[y * sstride + r * 2], (uint8_t)sum,
 			       (size_t)(width - 2 * r));
 		}
@@ -137,14 +137,14 @@ make_shadow(xcb_connection_t *c, const conv *kernel, double opacity, int width, 
 			for (int x = 0; x < swidth; x++) {
 				double sum = sum_kernel_normalized(kernel, d - x - 1,
 				                                   d - y - 1, width, d) *
-				             255.0;
+				             255.0 * opacity;
 				data[y * sstride + x] = (uint8_t)sum;
 				data[(sheight - y - 1) * sstride + x] = (uint8_t)sum;
 			}
 		}
 		for (int x = 0; x < swidth; x++) {
-			double sum =
-			    sum_kernel_normalized(kernel, d - x - 1, 0, width, d) * 255.0;
+			double sum = sum_kernel_normalized(kernel, d - x - 1, 0, width, d) *
+			             255.0 * opacity;
 			for (int y = r * 2; y < height; y++) {
 				data[y * sstride + x] = (uint8_t)sum;
 			}
@@ -291,16 +291,16 @@ shadow_picture_err:
 	return false;
 }
 
-void *
-default_backend_render_shadow(backend_t *backend_data, int width, int height,
-                              const conv *kernel, double r, double g, double b, double a) {
-	xcb_pixmap_t shadow_pixel = solid_picture(backend_data->c, backend_data->root,
-	                                          true, 1, r, g, b),
+void *default_backend_render_shadow(backend_t *backend_data, int width, int height,
+                                    struct backend_shadow_context *sctx, struct color color) {
+	const conv *kernel = (void *)sctx;
+	xcb_pixmap_t shadow_pixel = solid_picture(backend_data->c, backend_data->root, true,
+	                                          1, color.red, color.green, color.blue),
 	             shadow = XCB_NONE;
 	xcb_render_picture_t pict = XCB_NONE;
 
-	if (!build_shadow(backend_data->c, backend_data->root, a, width, height, kernel,
-	                  shadow_pixel, &shadow, &pict)) {
+	if (!build_shadow(backend_data->c, backend_data->root, color.alpha, width, height,
+	                  kernel, shadow_pixel, &shadow, &pict)) {
 		return NULL;
 	}
 
@@ -309,6 +309,34 @@ default_backend_render_shadow(backend_t *backend_data, int width, int height,
 	    backend_data, shadow, x_get_visual_info(backend_data->c, visual), true);
 	xcb_render_free_picture(backend_data->c, pict);
 	return ret;
+}
+
+/// Implement render_shadow with shadow_from_mask
+void *
+backend_render_shadow_from_mask(backend_t *backend_data, int width, int height,
+                                struct backend_shadow_context *sctx, struct color color) {
+	region_t reg;
+	pixman_region32_init_rect(&reg, 0, 0, (unsigned int)width, (unsigned int)height);
+	void *mask = backend_data->ops->make_mask(
+	    backend_data, (geometry_t){.width = width, .height = height}, &reg);
+	pixman_region32_fini(&reg);
+
+	void *shadow = backend_data->ops->shadow_from_mask(backend_data, mask, sctx, color);
+	backend_data->ops->release_image(backend_data, mask);
+	return shadow;
+}
+
+struct backend_shadow_context *
+default_create_shadow_context(backend_t *backend_data attr_unused, double radius) {
+	auto ret =
+	    (struct backend_shadow_context *)gaussian_kernel_autodetect_deviation(radius);
+	sum_kernel_preprocess((conv *)ret);
+	return ret;
+}
+
+void default_destroy_shadow_context(backend_t *backend_data attr_unused,
+                                    struct backend_shadow_context *sctx) {
+	free_conv((conv *)sctx);
 }
 
 static struct conv **generate_box_blur_kernel(struct box_blur_args *args, int *kernel_count) {
@@ -449,7 +477,10 @@ bool default_set_image_property(backend_t *base attr_unused, enum image_properti
 		tex->ewidth = iargs[0];
 		tex->eheight = iargs[1];
 		break;
+	case IMAGE_PROPERTY_CORNER_RADIUS: tex->corner_radius = dargs[0]; break;
 	case IMAGE_PROPERTY_MAX_BRIGHTNESS: tex->max_brightness = dargs[0]; break;
+	case IMAGE_PROPERTY_BORDER_WIDTH: tex->border_width = *(int *)arg; break;
+	case IMAGE_PROPERTY_CUSTOM_SHADER: break;
 	}
 
 	return true;
@@ -468,6 +499,7 @@ struct backend_image *default_new_backend_image(int w, int h) {
 	ret->eheight = h;
 	ret->ewidth = w;
 	ret->color_inverted = false;
+	ret->corner_radius = 0;
 	return ret;
 }
 
