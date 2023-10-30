@@ -28,9 +28,10 @@ Here is a full list of features that are now avaliable in `v1.0`
 - Blur rules. Background blurring is now done on a whitelist basis to reduce hardware consumption. (This might be changed in `v1.1` where you will be able to chose whether to use a whitelist or blacklist).
 
 ## What Is This?
-This is a fork of picom-pijulius which is avaliable on Nixpkgs and the Arch User Repository.
 
-This is currently the best actively maintained fork of picom adding proper animations.
+This was originally a fork of pijulius and nothing more, but since `1.0` this project has become much more and I hope it will go even further with your help. 
+
+This is currently the best actively maintained fork of picom adding proper animations, implementing all features from upstream `v10.2` and adding more features as requested by the community!
 
 
 ## Documentation can be found in the Wiki tab above.
