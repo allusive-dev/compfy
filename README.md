@@ -37,7 +37,7 @@ This is currently the best actively maintained fork of picom adding proper anima
 
 ## Documentation can be found in the Wiki tab above.
 
-The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/picom-allusive/-/documents/) the up and coming git versioning site for all your documentation and source organization needs!
+The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/picom-allusive/-/documents/) an up and coming git versioned database allows for more than just code to be versioned.
 
 Can't find what you need in the wiki or have an problem? Open an Issue.
 
