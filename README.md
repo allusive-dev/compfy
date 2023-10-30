@@ -10,7 +10,7 @@ Want to chat or maybe help bug test? Contatc me here:
 Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
 Can we get to 100 stars on GitHub next?
 
-**If you are feelling really generous I now have GitHub sponsor setup so you can support my work more directly.
+**If you are feelling really generous I now have GitHub sponsors setup so you can support my work more directly.
 Even if you can only give a small amount it goes a long way!**
 
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/allusive-dev)
