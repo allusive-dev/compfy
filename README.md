@@ -35,8 +35,9 @@ This was originally a fork of pijulius and nothing more, but since `1.0` this pr
 
 This is currently the best actively maintained fork of picom adding proper animations, implementing all features from upstream `v10.2` and adding more features as requested by the community!
 
-
 ## Documentation can be found in the Wiki tab above.
+
+The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/picom-allusive/-/documents/) the up and coming git versioning site for all your documentation and source organization needs!
 
 Can't find what you need in the wiki or have an problem? Open an Issue.
 
