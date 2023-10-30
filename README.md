@@ -11,7 +11,7 @@ Want to support my work or just ask a personal question? DM me and let's chat.
 Thanks very much for the support on this project recently, it really helps me stay motivated to keep working on it.
 Can we get to 100 stars on GitHub next?
 
-### AnnouncemenTs
+### Announcements
 
 UPDATE 1.0.0 IS HERE!!!
 
