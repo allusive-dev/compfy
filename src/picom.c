@@ -610,10 +610,10 @@ static void configure_root(session_t *ps) {
 	auto prop = x_get_prop(ps->c, ps->root, ps->atoms->a_NET_CURRENT_DESKTOP,
 					1L, XCB_ATOM_CARDINAL, 32);
 
-	ps->root_desktop_switch_direction = 0;
-	if (prop.nitems) {
-		ps->root_desktop_num = (int)*prop.c32;
-	}
+	// ps->root_desktop_switch_direction = 0;
+	// if (prop.nitems) {
+	// 	ps->root_desktop_num = (int)*prop.c32;
+	// }
 
 	rebuild_screen_reg(ps);
 	rebuild_shadow_exclude_reg(ps);
@@ -861,26 +861,26 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 				w->animation_velocity_h = 0.0;
 			}
 
-			if (!ps->root_desktop_switch_direction) {
-				if (w->state == WSTATE_UNMAPPING || w->state == WSTATE_DESTROYING) {
-					steps = 0;
-					double new_opacity = clamp(
-									w->opacity_target_old-w->animation_progress,
-									w->opacity_target, 1);
+			// if (!ps->root_desktop_switch_direction) {
+			// 	if (w->state == WSTATE_UNMAPPING || w->state == WSTATE_DESTROYING) {
+			// 		steps = 0;
+			// 		double new_opacity = clamp(
+			// 						w->opacity_target_old-w->animation_progress,
+			// 						w->opacity_target, 1);
 
-					if (new_opacity < w->opacity)
-						w->opacity = new_opacity;
+			// 		if (new_opacity < w->opacity)
+			// 			w->opacity = new_opacity;
 
-				} else if (w->state == WSTATE_MAPPING) {
-					steps = 0;
-					double new_opacity = clamp(
-										w->animation_progress,
-										0.0, w->opacity_target);
+			// 	} else if (w->state == WSTATE_MAPPING) {
+			// 		steps = 0;
+			// 		double new_opacity = clamp(
+			// 							w->animation_progress,
+			// 							0.0, w->opacity_target);
 
-					if (new_opacity > w->opacity)
-						w->opacity = new_opacity;
-				}
-			}
+			// 		if (new_opacity > w->opacity)
+			// 			w->opacity = new_opacity;
+			// 	}
+			// }
 
 			*animation_running = true;
 		}
@@ -895,37 +895,39 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 			*animation_running = true;
 		}
 
-		// Run fading
-		if (run_fade(ps, &w, steps)) {
-			*fade_running = true;
-		}
+		if (w->opacity != w->opacity_target) {
+			// Run fading
+			if (run_fade(ps, &w, steps)) {
+				*fade_running = true;
+			}
 
-		// Add window to damaged area if its opacity changes
-		// If was_painted == false, and to_paint is also false, we don't care
-		// If was_painted == false, but to_paint is true, damage will be added in
-		// the loop below
-		if (was_painted && w->opacity != opacity_old) {
-			add_damage_from_win(ps, w);
-		}
+			// Add window to damaged area if its opacity changes
+			// If was_painted == false, and to_paint is also false, we don't care
+			// If was_painted == false, but to_paint is true, damage will be added in
+			// the loop below
+			if (was_painted && w->opacity != opacity_old) {
+				add_damage_from_win(ps, w);
+			}
 
-		if (win_check_fade_finished(ps, w)) {
-			// the window has been destroyed because fading finished
-			continue;
-		}
+			if (win_check_fade_finished(ps, w)) {
+				// the window has been destroyed because fading finished
+				continue;
+			}
 
-		if (win_has_frame(w)) {
-			w->frame_opacity = ps->o.frame_opacity;
-		} else {
-			w->frame_opacity = 1.0;
-		}
+			if (win_has_frame(w)) {
+				w->frame_opacity = ps->o.frame_opacity;
+			} else {
+				w->frame_opacity = 1.0;
+			}
 
-		// Update window mode
-		w->mode = win_calc_mode(w);
+			// Update window mode
+			w->mode = win_calc_mode(w);
 
-		// Destroy all reg_ignore above when frame opaque state changes on
-		// SOLID mode
-		if (was_painted && w->mode != mode_old) {
-			w->reg_ignore_valid = false;
+			// Destroy all reg_ignore above when frame opaque state changes on
+			// SOLID mode
+			if (was_painted && w->mode != mode_old) {
+				w->reg_ignore_valid = false;
+			}
 		}
 	}
 
@@ -1747,7 +1749,7 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 	}
 	if (!animation_running) {
 		ps->animation_time = 0L;
-		ps->root_desktop_switch_direction = 0;
+		// ps->root_desktop_switch_direction = 0;
 	}
 
 	// TODO(yshui) Investigate how big the X critical section needs to be. There are

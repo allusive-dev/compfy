@@ -176,7 +176,7 @@ struct managed_win {
 	bool in_openclose;
 
 	/// Whether this window was transient when animated on open
-	bool animation_transient;
+	// bool animation_transient;
 	/// Current position and destination, for animation
 	double animation_center_x,      animation_center_y;
 	double animation_dest_center_x, animation_dest_center_y;

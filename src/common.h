@@ -197,9 +197,9 @@ typedef struct session {
 	/// Width of root window.
 	int root_width;
 	/// Current desktop number of root window
-	int root_desktop_num;
+	// int root_desktop_num;
 	/// Desktop switch direction
-	int root_desktop_switch_direction;
+	// int root_desktop_switch_direction;
 	/// X Composite overlay window.
 	xcb_window_t overlay;
 	/// The target window for debug mode
@@ -258,7 +258,7 @@ typedef struct session {
 	/// Pre-generated alpha pictures.
 	xcb_render_picture_t *alpha_picts;
 	/// Time of last fading. In milliseconds.
-	long long fade_time;
+	long fade_time;
 	/// Time of last window animation step. In milliseconds.
 	long animation_time;
 	/// Head pointer of the error ignore linked list.

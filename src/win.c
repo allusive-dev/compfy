@@ -474,20 +474,21 @@ static void win_update_properties(session_t *ps, struct managed_win *w) {
 static void init_animation(session_t *ps, struct managed_win *w) {
 	enum open_window_animation animation = ps->o.animation_for_open_window;
 
-	w->animation_transient = wid_has_prop(ps, w->client_win, ps->atoms->aWM_TRANSIENT_FOR);
+	// w->animation_transient = wid_has_prop(ps, w->client_win, ps->atoms->aWM_TRANSIENT_FOR);
 
 	// if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
-	// 	animation = ps->o.animation_for_transient_window;
+	// 	animation = ps->o.animation_for_open_window;
 
 	if (ps->o.wintype_option[w->window_type].animation < OPEN_WINDOW_ANIMATION_INVALID)
 		animation = ps->o.wintype_option[w->window_type].animation;
 
-	if (ps->root_desktop_switch_direction != 0) {
-		if (ps->o.animation_for_workspace_switch_in == OPEN_WINDOW_ANIMATION_AUTO)
-			animation = OPEN_WINDOW_ANIMATION_SLIDE_IN;
-		else
-			animation = ps->o.animation_for_workspace_switch_in;
-	}
+	// if (ps->root_desktop_switch_direction != 0) {
+	// 	if (ps->o.animation_for_workspace_switch_in == OPEN_WINDOW_ANIMATION_AUTO) {
+	// 		animation = OPEN_WINDOW_ANIMATION_SLIDE_IN;
+	// 	} else {
+	// 		animation = ps->o.animation_for_workspace_switch_in;
+	// 	}
+	// }
 
 	if (c2_match(ps, w, ps->o.animation_open_blacklist, NULL)) {
 		animation = OPEN_WINDOW_ANIMATION_NONE;
@@ -550,28 +551,28 @@ static void init_animation(session_t *ps, struct managed_win *w) {
 		w->animation_h = w->pending_g.height;
 		break;
 	}
-	case OPEN_WINDOW_ANIMATION_SLIDE_IN: {
-		w->animation_center_x = w->pending_g.x + w->pending_g.width * 0.5;
-		w->animation_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
-			ps->root_height *
-				((ps->root_desktop_switch_direction < 0 &&
-				 ps->root_desktop_switch_direction >= -1) ||
-				ps->root_desktop_switch_direction > 1?1:-1);
-		w->animation_w = w->pending_g.width;
-		w->animation_h = w->pending_g.height;
-		break;
-	}
-	case OPEN_WINDOW_ANIMATION_SLIDE_OUT: {
-		w->animation_dest_center_x = w->pending_g.x + w->pending_g.width * 0.5;
-		w->animation_dest_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
-			ps->root_height *
-				((ps->root_desktop_switch_direction < 0 &&
-				 ps->root_desktop_switch_direction >= -1) ||
-				ps->root_desktop_switch_direction > 1?-1:1);
-		w->animation_dest_w = w->pending_g.width;
-		w->animation_dest_h = w->pending_g.height;
-		break;
-	}
+	// case OPEN_WINDOW_ANIMATION_SLIDE_IN: {
+	// 	w->animation_center_x = w->pending_g.x + w->pending_g.width * 0.5;
+	// 	w->animation_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
+	// 		ps->root_height *
+	// 			((ps->root_desktop_switch_direction < 0 &&
+	// 			 ps->root_desktop_switch_direction >= -1) ||
+	// 			ps->root_desktop_switch_direction > 1?1:-1);
+	// 	w->animation_w = w->pending_g.width;
+	// 	w->animation_h = w->pending_g.height;
+	// 	break;
+	// }
+	// case OPEN_WINDOW_ANIMATION_SLIDE_OUT: {
+	// 	w->animation_dest_center_x = w->pending_g.x + w->pending_g.width * 0.5;
+	// 	w->animation_dest_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
+	// 		ps->root_height *
+	// 			((ps->root_desktop_switch_direction < 0 &&
+	// 			 ps->root_desktop_switch_direction >= -1) ||
+	// 			ps->root_desktop_switch_direction > 1?-1:1);
+	// 	w->animation_dest_w = w->pending_g.width;
+	// 	w->animation_dest_h = w->pending_g.height;
+	// 	break;
+	// }
 	case OPEN_WINDOW_ANIMATION_INVALID: assert(false); break;
 	}
 }
@@ -582,8 +583,8 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 	if (ps->o.animation_for_unmap_window == OPEN_WINDOW_ANIMATION_AUTO) {
 		animation = ps->o.animation_for_open_window;
 
-		if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
-			animation = ps->o.animation_for_unmap_window;
+		// if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
+		// 	animation = ps->o.animation_for_unmap_window;
 
 		if (ps->o.wintype_option[w->window_type].animation < OPEN_WINDOW_ANIMATION_INVALID)
 			animation = ps->o.wintype_option[w->window_type].animation;
@@ -596,10 +597,10 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 			animation = OPEN_WINDOW_ANIMATION_SLIDE_RIGHT;
 		else if (animation == OPEN_WINDOW_ANIMATION_SLIDE_RIGHT)
 			animation = OPEN_WINDOW_ANIMATION_SLIDE_LEFT;
-		else if (animation == OPEN_WINDOW_ANIMATION_SLIDE_IN)
-			animation = OPEN_WINDOW_ANIMATION_SLIDE_OUT;
-		else if (animation == OPEN_WINDOW_ANIMATION_SLIDE_OUT)
-			animation = OPEN_WINDOW_ANIMATION_SLIDE_IN;
+		// else if (animation == OPEN_WINDOW_ANIMATION_SLIDE_IN)
+		// 	animation = OPEN_WINDOW_ANIMATION_SLIDE_OUT;
+		// else if (animation == OPEN_WINDOW_ANIMATION_SLIDE_OUT)
+		// 	animation = OPEN_WINDOW_ANIMATION_SLIDE_IN;
 
 	} else {
 		animation = ps->o.animation_for_unmap_window;
@@ -608,12 +609,12 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 			animation = ps->o.wintype_option[w->window_type].animation_unmap;
 	}
 
-	if (ps->root_desktop_switch_direction != 0) {
-		if (ps->o.animation_for_workspace_switch_out == OPEN_WINDOW_ANIMATION_AUTO)
-			animation = OPEN_WINDOW_ANIMATION_SLIDE_OUT;
-		else
-			animation = ps->o.animation_for_workspace_switch_out;
-	}
+	// if (ps->root_desktop_switch_direction != 0) {
+	// 	if (ps->o.animation_for_workspace_switch_out == OPEN_WINDOW_ANIMATION_AUTO)
+	// 		animation = OPEN_WINDOW_ANIMATION_SLIDE_OUT;
+	// 	else
+	// 		animation = ps->o.animation_for_workspace_switch_out;
+	// }
 
 	if (c2_match(ps, w, ps->o.animation_unmap_blacklist, NULL)) {
 		animation = OPEN_WINDOW_ANIMATION_NONE;
@@ -676,28 +677,28 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 		w->animation_dest_h = w->pending_g.height;
 		break;
 	}
-	case OPEN_WINDOW_ANIMATION_SLIDE_IN: {
-		w->animation_center_x = w->pending_g.x + w->pending_g.width * 0.5;
-		w->animation_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
-			ps->root_height *
-				((ps->root_desktop_switch_direction < 0 &&
-				 ps->root_desktop_switch_direction >= -1) ||
-				ps->root_desktop_switch_direction > 1?1:-1);
-		w->animation_w = w->pending_g.width;
-		w->animation_h = w->pending_g.height;
-		break;
-	}
-	case OPEN_WINDOW_ANIMATION_SLIDE_OUT: {
-		w->animation_dest_center_x = w->pending_g.x + w->pending_g.width * 0.5;
-		w->animation_dest_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
-			ps->root_height *
-				((ps->root_desktop_switch_direction < 0 &&
-				 ps->root_desktop_switch_direction >= -1) ||
-				ps->root_desktop_switch_direction > 1?-1:1);
-		w->animation_dest_w = w->pending_g.width;
-		w->animation_dest_h = w->pending_g.height;
-		break;
-	}
+	// case OPEN_WINDOW_ANIMATION_SLIDE_IN: {
+	// 	w->animation_center_x = w->pending_g.x + w->pending_g.width * 0.5;
+	// 	w->animation_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
+	// 		ps->root_height *
+	// 			((ps->root_desktop_switch_direction < 0 &&
+	// 			 ps->root_desktop_switch_direction >= -1) ||
+	// 			ps->root_desktop_switch_direction > 1?1:-1);
+	// 	w->animation_w = w->pending_g.width;
+	// 	w->animation_h = w->pending_g.height;
+	// 	break;
+	// }
+	// case OPEN_WINDOW_ANIMATION_SLIDE_OUT: {
+	// 	w->animation_dest_center_x = w->pending_g.x + w->pending_g.width * 0.5;
+	// 	w->animation_dest_center_y = w->pending_g.y + w->pending_g.height * 0.5 -
+	// 		ps->root_height *
+	// 			((ps->root_desktop_switch_direction < 0 &&
+	// 			 ps->root_desktop_switch_direction >= -1) ||
+	// 			ps->root_desktop_switch_direction > 1?-1:1);
+	// 	w->animation_dest_w = w->pending_g.width;
+	// 	w->animation_dest_h = w->pending_g.height;
+	// 	break;
+	// }
 	case OPEN_WINDOW_ANIMATION_INVALID: assert(false); break;
 	}
 }
@@ -1120,8 +1121,8 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 		return 0;
 	}
 	if (w->state == WSTATE_UNMAPPING || w->state == WSTATE_DESTROYING) {
-		if (ps->root_desktop_switch_direction)
-			return w->opacity;
+		// if (ps->root_desktop_switch_direction)
+		// 	return w->opacity;
 
 		return 0;
 	}

@@ -746,14 +746,14 @@ void set_default_winopts(options_t *opt, win_option_mask_t *mask, bool shadow_en
 			mask[i].animation_unmap = OPEN_WINDOW_ANIMATION_INVALID;
 			opt->wintype_option[i].animation_unmap = OPEN_WINDOW_ANIMATION_INVALID;
 		}
-		if (!mask[i].animation_workspace_in) {
-			mask[i].animation_workspace_in = OPEN_WINDOW_ANIMATION_INVALID;
-			opt->wintype_option[i].animation_workspace_in = OPEN_WINDOW_ANIMATION_INVALID;
-		}
-		if (!mask[i].animation_workspace_out) {
-			mask[i].animation_workspace_out = OPEN_WINDOW_ANIMATION_INVALID;
-			opt->wintype_option[i].animation_workspace_out = OPEN_WINDOW_ANIMATION_INVALID;
-		}
+		// if (!mask[i].animation_workspace_in) {
+		// 	mask[i].animation_workspace_in = OPEN_WINDOW_ANIMATION_INVALID;
+		// 	opt->wintype_option[i].animation_workspace_in = OPEN_WINDOW_ANIMATION_INVALID;
+		// }
+		// if (!mask[i].animation_workspace_out) {
+		// 	mask[i].animation_workspace_out = OPEN_WINDOW_ANIMATION_INVALID;
+		// 	opt->wintype_option[i].animation_workspace_out = OPEN_WINDOW_ANIMATION_INVALID;
+		// }
 		if (!mask[i].clip_shadow_above) {
 			mask[i].clip_shadow_above = true;
 			opt->wintype_option[i].clip_shadow_above = false;
@@ -830,10 +830,10 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 	    .animations = true,
 	    .animation_for_open_window = OPEN_WINDOW_ANIMATION_ZOOM,
-	    .animation_for_transient_window = OPEN_WINDOW_ANIMATION_ZOOM,
+	    // .animation_for_transient_window = OPEN_WINDOW_ANIMATION_NONE,
 	    .animation_for_unmap_window = OPEN_WINDOW_ANIMATION_ZOOM,
-	    .animation_for_workspace_switch_in = OPEN_WINDOW_ANIMATION_ZOOM,
-	    .animation_for_workspace_switch_out = OPEN_WINDOW_ANIMATION_ZOOM,
+	    // .animation_for_workspace_switch_in = OPEN_WINDOW_ANIMATION_NONE,
+	    // .animation_for_workspace_switch_out = OPEN_WINDOW_ANIMATION_NONE,
 	    .animation_stiffness = 100.0,
 	    .animation_window_mass = 0.5,
 	    .animation_dampening = 10,

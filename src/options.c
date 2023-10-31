@@ -181,7 +181,7 @@ static const struct picom_option picom_options[] = {
     {"animation-window-mass", required_argument, 807, NULL, "window mass"},
     {"animation-clamping", no_argument, 808, NULL, "clamping"},
     {"animation-for-open-window", required_argument, 809, NULL, "open window animation"},
-    {"animation-for-transient-window", required_argument, 810, NULL, "transient window animation"},
+    // {"animation-for-transient-window", required_argument, 810, NULL, "transient window animation"},
     {"animation-for-unmap-window", required_argument, 811, NULL, "unmap window animation"},
     {"corners-rule", required_argument, NULL, 812, "rounded corner rules"},
     {"blur-rule", required_argument, NULL, 813, "blur rules"},
@@ -762,16 +762,16 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			}
 			break;
 		}
-		case 810: {
-			// --animation-for-transient-window
-			enum open_window_animation animation = parse_open_window_animation(optarg);
-			if (animation >= OPEN_WINDOW_ANIMATION_INVALID) {
-				log_warn("Invalid transient-window animation %s, ignoring.", optarg);
-			} else {
-				opt->animation_for_transient_window = animation;
-			}
-			break;
-		}
+		// case 810: {
+		// 	// --animation-for-transient-window
+		// 	enum open_window_animation animation = parse_open_window_animation(optarg);
+		// 	if (animation >= OPEN_WINDOW_ANIMATION_INVALID) {
+		// 		log_warn("Invalid transient-window animation %s, ignoring.", optarg);
+		// 	} else {
+		// 		opt->animation_for_transient_window = animation;
+		// 	}
+		// 	break;
+		// }
 		case 811: {
 			// --animation-for-unmap-window
 			enum open_window_animation animation = parse_open_window_animation(optarg);
