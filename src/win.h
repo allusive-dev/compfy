@@ -143,7 +143,7 @@ struct managed_win {
 	/// bitmap for properties which needs to be updated
 	uint64_t *stale_props;
 	/// number of uint64_ts that has been allocated for stale_props
-	size_t stale_props_capacity;
+	uint64_t stale_props_capacity;
 
 	/// Bounding shape of the window. In local coordinates.
 	/// See above about coordinate systems.

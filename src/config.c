@@ -871,7 +871,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 	    .use_ewmh_active_win = false,
 	    .focus_blacklist = NULL,
-	    .detect_transient = true,
+	    .detect_transient = false,
 	    .detect_client_leader = false,
 	    .no_ewmh_fullscreen = false,
 

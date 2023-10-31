@@ -304,13 +304,13 @@ static inline void win_release_pixmap(backend_t *base, struct managed_win *w) {
 		w->flags |= WIN_FLAGS_PIXMAP_NONE;
 	}
 }
-// static inline void win_release_oldpixmap(backend_t *base, struct managed_win *w) {
-// 	log_debug("Releasing old_pixmap of window %#010x (%s)", w->base.id, w->name);
-// 	if (w->old_win_image) {
-// 		base->ops->release_image(base, w->old_win_image);
-// 		w->old_win_image = NULL;
-// 	}
-// }
+static inline void win_release_oldpixmap(backend_t *base, struct managed_win *w) {
+	log_debug("Releasing old_pixmap of window %#010x (%s)", w->base.id, w->name);
+	if (w->old_win_image) {
+		base->ops->release_image(base, w->old_win_image);
+		w->old_win_image = NULL;
+	}
+}
 static inline void win_release_shadow(backend_t *base, struct managed_win *w) {
 	log_debug("Releasing shadow of window %#010x (%s)", w->base.id, w->name);
 	assert(w->shadow_image);
@@ -403,7 +403,7 @@ void win_release_images(struct backend_base *backend, struct managed_win *w) {
 	if (!win_check_flags_all(w, WIN_FLAGS_PIXMAP_NONE)) {
 		assert(!win_check_flags_all(w, WIN_FLAGS_PIXMAP_STALE));
 		win_release_pixmap(backend, w);
-		// win_release_oldpixmap(backend, w);
+		win_release_oldpixmap(backend, w);
 	}
 
 	if (!win_check_flags_all(w, WIN_FLAGS_SHADOW_NONE)) {
@@ -476,8 +476,8 @@ static void init_animation(session_t *ps, struct managed_win *w) {
 
 	w->animation_transient = wid_has_prop(ps, w->client_win, ps->atoms->aWM_TRANSIENT_FOR);
 
-	if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
-		animation = ps->o.animation_for_transient_window;
+	// if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
+	// 	animation = ps->o.animation_for_transient_window;
 
 	if (ps->o.wintype_option[w->window_type].animation < OPEN_WINDOW_ANIMATION_INVALID)
 		animation = ps->o.wintype_option[w->window_type].animation;
@@ -583,7 +583,7 @@ static void init_animation_unmap(session_t *ps, struct managed_win *w) {
 		animation = ps->o.animation_for_open_window;
 
 		if (w->window_type != WINTYPE_TOOLTIP && w->animation_transient)
-			animation = ps->o.animation_for_transient_window;
+			animation = ps->o.animation_for_unmap_window;
 
 		if (ps->o.wintype_option[w->window_type].animation < OPEN_WINDOW_ANIMATION_INVALID)
 			animation = ps->o.wintype_option[w->window_type].animation;
@@ -1568,9 +1568,11 @@ void win_on_win_size_change(session_t *ps, struct managed_win *w) {
 	assert(w->state != WSTATE_UNMAPPED && w->state != WSTATE_DESTROYING &&
 	       w->state != WSTATE_UNMAPPING);
 
-	// Invalidate the shadow we built
-	win_set_flags(w, WIN_FLAGS_IMAGES_STALE);
-	win_release_mask(ps->backend_data, w);
+	// Invalidate the shadow we built | CHANGED BY ALLUSIVE
+	if (w->state != WSTATE_DESTROYING) {
+		win_set_flags(w, WIN_FLAGS_IMAGES_STALE);
+		win_release_mask(ps->backend_data, w);
+	}
 	ps->pending_updates = true;
 	free_paint(ps, &w->shadow_paint);
 }
@@ -2426,7 +2428,7 @@ static void unmap_win_finish(session_t *ps, struct managed_win *w) {
 		// Shadow image can be preserved.
 		if (!win_check_flags_all(w, WIN_FLAGS_PIXMAP_NONE)) {
 			win_release_pixmap(ps->backend_data, w);
-			// win_release_oldpixmap(ps->backend_data, w);
+			win_release_oldpixmap(ps->backend_data, w);
 		}
 	} else {
 		assert(!w->win_image);
