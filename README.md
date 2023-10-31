@@ -1,5 +1,5 @@
 # picom-allusive
-A Fork of Pijulius picom by Allusive.
+See [What is This]()
 
 Want to chat or maybe help bug test? Contatct me here:
 
