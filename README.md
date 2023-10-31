@@ -17,11 +17,11 @@ Even if you can only give a small amount it goes a long way!**
 
 ### Announcements
 
-UPDATE 1.0.0 IS HERE!!!
+UPDATE v1 IS HERE!!!
 
-Please check out the updated documentation!
+Please check out the updated documentation.
 
-Here is a full list of features that are now avaliable in `v1.0`
+Here is a full list of features that are now avaliable going ahead from `1.0`
 
 - Includes all fixes and changes from `yshui/picom-v10.2`
 - Includes pijulius animation code. (
