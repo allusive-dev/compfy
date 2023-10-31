@@ -532,14 +532,13 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		opt->animation_for_open_window = animation;
 	}
 	// --animation-for-transient-window
-	// if (config_lookup_string(&cfg, "animation-for-transient-window", &sval)) {
-	// 	enum open_window_animation animation = parse_open_window_animation(sval);
-	// 	if (animation >= OPEN_WINDOW_ANIMATION_INVALID) {
-	// 		log_fatal("Invalid transient-window animation %s", sval);
-	// 		goto err;
-	// 	}
-	// 	opt->animation_for_transient_window = animation;
-	// }
+	if (config_lookup_string(&cfg, "animation-for-transient-window", &sval)) {
+		enum open_window_animation animation = parse_open_window_animation(sval);
+		if (animation) {
+			log_fatal("animation-for-transient-window is deprecated and can no longer be used. Please remove it remove your config. %s", sval);
+			goto err;
+		}
+	}
 	// --animation-for-unmap-window
 	if (config_lookup_string(&cfg, "animation-for-unmap-window", &sval)) {
 		enum open_window_animation animation = parse_open_window_animation(sval);
@@ -549,24 +548,22 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		}
 		opt->animation_for_unmap_window = animation;
 	}
-	// // --animation-for-workspace-switch-in
-	// if (config_lookup_string(&cfg, "animation-for-workspace-switch-in", &sval)) {
-	// 	enum open_window_animation animation = parse_open_window_animation(sval);
-	// 	if (animation >= OPEN_WINDOW_ANIMATION_INVALID) {
-	// 		log_fatal("Invalid workspace-switch-in animation %s", sval);
-	// 		goto err;
-	// 	}
-	// 	opt->animation_for_workspace_switch_in = animation;
-	// }
-	// // --animation-for-workspace-switch-out
-	// if (config_lookup_string(&cfg, "animation-for-workspace-switch-out", &sval)) {
-	// 	enum open_window_animation animation = parse_open_window_animation(sval);
-	// 	if (animation >= OPEN_WINDOW_ANIMATION_INVALID) {
-	// 		log_fatal("Invalid workspace-switch-out animation %s", sval);
-	// 		goto err;
-	// 	}
-	// 	opt->animation_for_workspace_switch_out = animation;
-	// }
+	// --animation-for-workspace-switch-in
+	if (config_lookup_string(&cfg, "animation-for-workspace-switch-in", &sval)) {
+		enum open_window_animation animation = parse_open_window_animation(sval);
+		if (animation) {
+			log_fatal("animation-for-workspace-switch-in is deprecated and can no longer be used. Please remove it remove your config. %s", sval);
+			goto err;
+		}
+	}
+	// --animation-for-workspace-switch-out
+	if (config_lookup_string(&cfg, "animation-for-workspace-switch-out", &sval)) {
+		enum open_window_animation animation = parse_open_window_animation(sval);
+		if (animation) {
+			log_fatal("animation-for-workspace-switch-out is deprecated and can no longer be used. Please remove it remove your config. %s", sval);
+			goto err;
+		}
+	}
 	// --animation-stiffness
 	config_lookup_float(&cfg, "animation-stiffness", &opt->animation_stiffness);
 	// --animation-window-mass

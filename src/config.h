@@ -80,8 +80,8 @@ typedef struct win_option {
 	bool clip_shadow_above;
 	enum open_window_animation animation;
 	enum open_window_animation animation_unmap;
-	enum open_window_animation animation_workspace_in;
-	enum open_window_animation animation_workspace_out;
+	// enum open_window_animation animation_workspace_in;
+	// enum open_window_animation animation_workspace_out;
 } win_option_t;
 
 enum blur_method {

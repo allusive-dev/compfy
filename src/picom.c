@@ -607,8 +607,8 @@ static void configure_root(session_t *ps) {
 	ps->root_width = r->width;
 	ps->root_height = r->height;
 
-	auto prop = x_get_prop(ps->c, ps->root, ps->atoms->a_NET_CURRENT_DESKTOP,
-					1L, XCB_ATOM_CARDINAL, 32);
+	// auto prop = x_get_prop(ps->c, ps->root, ps->atoms->a_NET_CURRENT_DESKTOP,
+	// 				1L, XCB_ATOM_CARDINAL, 32);
 
 	// ps->root_desktop_switch_direction = 0;
 	// if (prop.nitems) {
