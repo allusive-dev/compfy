@@ -69,7 +69,7 @@ $ yay -S picom-allusive
 
 ### NixOS
 
-picom-allusive is now avaliable on unstable(23.11)!
+picom-allusive is avaliable on unstable(23.11)
 
 Keep in mind it can take up to a week after picom is updated before it will be avaliable on NixOS.
 
