@@ -17,8 +17,6 @@ Even if you can only give a small amount it goes a long way!**
 
 ### Announcements
 
-UPDATE v1 IS HERE!!!
-
 Please check out the updated documentation.
 
 Here is a full list of features that are now avaliable going ahead from `1.0`
@@ -34,6 +32,7 @@ Here is a full list of features that are now avaliable going ahead from `1.0`
 - Includes corners-rule. Allowing you to set the corner-radius on a per window basis.
 - Animation open and unmap exclusion lists! Don't want something animating? Now you can fix that.
 - Blur rules. Background blurring is now done on a whitelist basis to reduce hardware consumption.
+- (As of `1.2.3`) fixes rounded corner issues on AwesomeWM.
 
 ## What Is This?
 
