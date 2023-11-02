@@ -24,15 +24,14 @@ Here is a full list of features that are now avaliable going ahead from `1.0`
 - Includes all fixes and changes from `yshui/picom-v10.2`
 - Includes pijulius animation code. (
 
-    **As of `1.2.0` `animation-for-workspace-in`, `animation-for-workspace-out`, `animation-for-transient-window` have been removed because their corrosponding functions caused the issue of the wrong animations playing in all other instances.**
-
-    If anyone has an issue with this please let me know in a issue.
+    **As of `1.2.0` `animation-for-workspace-in`, `animation-for-workspace-out`, `animation-for-transient-window` have been removed because their corrosponding functions caused the issue of the wrong animations playing in all other instances, Aswell as not working as intended**
   
   )
 - Includes corners-rule. Allowing you to set the corner-radius on a per window basis.
 - Animation open and unmap exclusion lists! Don't want something animating? Now you can fix that.
 - Blur rules. Background blurring is now done on a whitelist basis to reduce hardware consumption.
 - (As of `1.2.3`) fixes rounded corner issues on AwesomeWM.
+- (As of `1.2.4`) A New option, `wm-support` has been added. This will be expanded upon in the future but it currently fixes the corner issue on AwesomeWM when passing in `"awesome"`.
 
 ## What Is This?
 
