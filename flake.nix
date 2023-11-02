@@ -4,18 +4,30 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+    flake-utils.lib.eachDefaultSystem (
+      system: let
         pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
+      in {
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [ ];
-          buildInputs = with pkgs; [ ];
+          nativeBuildInputs = with pkgs; [];
+          buildInputs = with pkgs; [];
         };
 
-        packages.default = pkgs.picom.overrideAttrs (old: { src = ./.; });
+        packages = rec {
+          default = picom-allusive;
+          picom-allusive = pkgs.picom.overrideAttrs (_old: {src = ./.;});
+        };
+
+        overlays = rec {
+          default = picom-allusive;
+          picom-allusive = self.packages.default;
+        };
       }
     );
 }
