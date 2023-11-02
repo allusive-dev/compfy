@@ -183,10 +183,11 @@ static const struct picom_option picom_options[] = {
     {"animation-for-open-window", required_argument, 809, NULL, "open window animation"},
     // {"animation-for-transient-window", required_argument, 810, NULL, "transient window animation"},
     {"animation-for-unmap-window", required_argument, 811, NULL, "unmap window animation"},
-    {"corners-rule", required_argument, NULL, 812, "rounded corner rules"},
-    {"blur-rule", required_argument, NULL, 813, "blur rules"},
-    {"animation-open-exclude", required_argument, NULL, 814, "animation open exclude list"},
-    {"animation-unmap-exclude", required_argument, NULL, 815, "animation unmap exclude list"},
+    {"corners-rule", required_argument, 812, NULL, "rounded corner rules"},
+    {"blur-rule", required_argument, 813, NULL, "blur rules"},
+    {"animation-open-exclude", required_argument, 814, NULL, "animation open exclude list"},
+    {"animation-unmap-exclude", required_argument, 815, NULL, "animation unmap exclude list"},
+    {"wm-support", required_argument, 816, NULL, "Set specific window manager support"},
 };
 // clang-format on
 
@@ -796,6 +797,16 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 		case 815:
 			condlst_add(&opt->animation_unmap_blacklist, optarg);
 			break;
+		case 816: {
+			// wm-support
+			enum wm_support wm = parse_wm_support(optarg);
+			if (wm >= WM_SUPPORT_INVALID) {
+				log_warn("Invalid window manager %s, ignoring.", optarg);
+			} else {
+				opt->support_for_wm = wm;
+			}
+			break;
+		}
 		default: usage(argv[0], 1); break;
 #undef P_CASEBOOL
 		}

@@ -590,6 +590,15 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
 	// blur-rule
 	parse_cfg_condlst(&cfg, &opt->blur_rules, "blur-rule");
+	// wm-support
+	if (config_lookup_string(&cfg, "wm-support", &sval)) {
+		enum wm_support wm = parse_wm_support(sval);
+		if (wm >= WM_SUPPORT_INVALID) {
+			log_fatal("Invalid window manager name passed %s", sval);
+			goto err;
+		}
+		opt->support_for_wm = wm;
+	}
 	// --opacity-rule
 	parse_cfg_condlst_opct(opt, &cfg, "opacity-rule");
 	// --unredir-if-possible-exclude

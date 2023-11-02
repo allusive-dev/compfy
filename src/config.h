@@ -54,6 +54,12 @@ enum open_window_animation {
 	OPEN_WINDOW_ANIMATION_INVALID,
 };
 
+enum wm_support {
+	WM_SUPPORT_NONE = 0,
+	WM_SUPPORT_AWESOME,
+	WM_SUPPORT_INVALID,
+};
+
 typedef struct win_option_mask {
 	bool shadow : 1;
 	bool fade : 1;
@@ -221,6 +227,9 @@ typedef struct options {
 	/// Whether to clamp animations
 	bool animation_clamping;
 
+	// Wm Support
+	enum wm_support support_for_wm;
+
 	// === Opacity ===
 	/// Default opacity for inactive windows.
 	/// 32-bit integer with the format of _NET_WM_WINDOW_OPACITY.
@@ -328,6 +337,7 @@ char *must_use locate_auxiliary_file(const char *scope, const char *path,
                                      const char *include_dir);
 enum blur_method must_use parse_blur_method(const char *src);
 enum open_window_animation must_use parse_open_window_animation(const char *src);
+enum wm_support must_use parse_wm_support(const char *src);
 
 /**
  * Add a pattern to a condition linked list.

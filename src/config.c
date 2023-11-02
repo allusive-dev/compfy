@@ -782,6 +782,15 @@ enum open_window_animation parse_open_window_animation(const char *src) {
 	return OPEN_WINDOW_ANIMATION_INVALID;
 }
 
+enum wm_support parse_wm_support(const char *src) {
+	if (strcmp(src, "none") == 0) {
+		return WM_SUPPORT_NONE;
+	}else if (strcmp(src, "awesome") == 0) {
+		return WM_SUPPORT_AWESOME;
+	}
+	return WM_SUPPORT_INVALID;
+}
+
 char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
                    bool *fading_enable, bool *hasneg, win_option_mask_t *winopt_mask) {
 	// clang-format off
@@ -845,6 +854,8 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 		.corner_rules = NULL,
 		.blur_rules = NULL,
+
+		.support_for_wm = WM_SUPPORT_NONE,
 
 	    .inactive_opacity = 1.0,
 	    .inactive_opacity_override = false,
