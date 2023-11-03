@@ -785,8 +785,10 @@ enum open_window_animation parse_open_window_animation(const char *src) {
 enum wm_support parse_wm_support(const char *src) {
 	if (strcmp(src, "none") == 0) {
 		return WM_SUPPORT_NONE;
-	}else if (strcmp(src, "awesome") == 0) {
+	} else if (strcmp(src, "awesome") == 0) {
 		return WM_SUPPORT_AWESOME;
+	} else if (strcmp(src, "dwm") == 0) {
+		return WM_SUPPORT_DWM;
 	}
 	return WM_SUPPORT_INVALID;
 }

@@ -1143,9 +1143,15 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 			opacity = ps->o.inactive_opacity;
 	}
 
-	// respect inactive override
-	if (ps->o.inactive_opacity_override && !w->focused) {
-		opacity = ps->o.inactive_opacity;
+	// Respect inactive opacity, with support for DWM.
+	if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
+		if (ps->o.inactive_opacity_override && !win_is_focused_raw(ps, w)) {
+			opacity = ps->o.inactive_opacity;
+		}
+	} else {
+		if (ps->o.inactive_opacity_override && !w->focused) {
+			opacity = ps->o.inactive_opacity;
+		}
 	}
 
 	return opacity;
