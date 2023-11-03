@@ -1129,30 +1129,84 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 	// Try obeying opacity property and window type opacity firstly
 	if (w->has_opacity_prop) {
 		opacity = ((double)w->opacity_prop) / OPAQUE;
-	} else if (w->opacity_is_set) {
+	} else if (w->opacity_is_set && !ps->o.inactive_opacity_override) {
 		opacity = w->opacity_set;
+	} else if (w->opacity_is_set && ps->o.inactive_opacity_override) {
+		if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
+			if (win_is_focused_raw(ps, w)) {
+				opacity = w->opacity_set;
+			} else if (!win_is_focused_raw(ps, w)) {
+				if (ps->o.inactive_opacity == 1.0) {
+					opacity = w->opacity_set;
+				} else {
+					opacity = ps->o.inactive_opacity;
+				}
+			}
+		} else {
+			if (win_is_focused_raw(ps, w)) {
+				opacity = w->opacity_set;
+			} else if (!w->focused) {
+				if (ps->o.inactive_opacity == 1.0) {
+					opacity = w->opacity_set;
+				} else {
+					opacity = ps->o.inactive_opacity;
+				}
+			}
+		}
 	} else if (!safe_isnan(ps->o.wintype_option[w->window_type].opacity)) {
 		opacity = ps->o.wintype_option[w->window_type].opacity;
 	} else {
+
 		// Respect active_opacity only when the window is physically
 		// focused
-		if (win_is_focused_raw(ps, w))
+		if (win_is_focused_raw(ps, w)) {
+			// if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+			// 	opacity = 1.0;
+			// } else {
 			opacity = ps->o.active_opacity;
-		else if (!w->focused)
+			// }
+		} else if (!w->focused) {
 			// Respect inactive_opacity in some cases
+			// if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+			// 	if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+			// 		opacity = 1.0;
+			// 	} else {
+			// 		opacity = ps->o.active_opacity;
+			// 	}
+			// } else {
 			opacity = ps->o.inactive_opacity;
+			// }
+		}
 	}
 
-	// Respect inactive opacity, with support for DWM.
-	if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
-		if (ps->o.inactive_opacity_override && !win_is_focused_raw(ps, w)) {
-			opacity = ps->o.inactive_opacity;
-		}
-	} else {
-		if (ps->o.inactive_opacity_override && !w->focused) {
-			opacity = ps->o.inactive_opacity;
-		}
-	}
+	// // Respect inactive opacity, with support for DWM.
+	// if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
+	// 	if (ps->o.inactive_opacity_override && !win_is_focused_raw(ps, w)) {
+	// 		// if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+	// 		// 	if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+	// 		// 		opacity = 1.0;
+	// 		// 	} else {
+	// 		// 		opacity = ps->o.active_opacity;
+	// 		// 	}
+	// 		// } else {
+	// 		opacity = ps->o.inactive_opacity;
+	// 		// }
+	// 	} else if (!ps->o.inactive_opacity_override && !win_is_focused_raw(ps, w)) {
+	// 		// if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+	// 		// 	if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+	// 		// 		opacity = 1.0;
+	// 		// 	} else {
+	// 		// 		opacity = ps->o.active_opacity;
+	// 		// 	}
+	// 		// } else {
+	// 		opacity = ps->o.inactive_opacity;
+	// 		// }
+	// 	}
+	// } else {
+	// 	if (ps->o.inactive_opacity_override && !w->focused) {
+	// 		opacity = ps->o.inactive_opacity;
+	// 	}
+	// }
 
 	return opacity;
 }

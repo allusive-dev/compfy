@@ -2148,6 +2148,8 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	      c2_list_postprocess(ps, ps->o.blur_rules) &&
 	      c2_list_postprocess(ps, ps->o.animation_open_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.animation_unmap_blacklist) &&
+	      c2_list_postprocess(ps, ps->o.active_opacity_blacklist) &&
+	      c2_list_postprocess(ps, ps->o.inactive_opacity_blacklist) &&
 	      c2_list_postprocess(ps, ps->o.focus_blacklist))) {
 		log_error("Post-processing of conditionals failed, some of your rules "
 		          "might not work");
@@ -2542,6 +2544,8 @@ static void session_destroy(session_t *ps) {
 	c2_list_free(&ps->o.blur_rules, NULL);
 	c2_list_free(&ps->o.animation_open_blacklist, NULL);
 	c2_list_free(&ps->o.animation_unmap_blacklist, NULL);
+	c2_list_free(&ps->o.active_opacity_blacklist, NULL);
+	c2_list_free(&ps->o.inactive_opacity_blacklist, NULL);
 	c2_list_free(&ps->o.window_shader_fg_rules, free);
 
 	// Free tracked atom list

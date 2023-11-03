@@ -289,6 +289,10 @@ typedef struct options {
 	c2_lptr_t *animation_open_blacklist;
 	// Rules to exclude windows from having a unmap animation	
 	c2_lptr_t *animation_unmap_blacklist;
+	// Rules to exclude windows from having being affected by active-opacity
+	c2_lptr_t *active_opacity_blacklist;
+	// Rules to exclude windows from having being affected by inactive-opacity
+	c2_lptr_t *inactive_opacity_blacklist;
 	/// Limit window brightness
 	double max_brightness;
 	// Radius of rounded window corners

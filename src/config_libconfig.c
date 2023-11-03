@@ -586,6 +586,10 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
 	// animation exclude
 	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
+	// active opacity exclude
+	parse_cfg_condlst(&cfg, &opt->active_opacity_blacklist, "active-opacity-exclude");
+	// inactive opacity exclude
+	parse_cfg_condlst(&cfg, &opt->inactive_opacity_blacklist, "inactive-opacity-exclude");
 	// corners-rule
 	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
 	// blur-rule

@@ -853,6 +853,8 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 	    .animation_clamping = true,
 		.animation_open_blacklist = NULL,
 		.animation_unmap_blacklist = NULL,
+		.active_opacity_blacklist = NULL,
+		.inactive_opacity_blacklist = NULL,
 
 		.corner_rules = NULL,
 		.blur_rules = NULL,

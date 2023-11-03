@@ -188,6 +188,8 @@ static const struct picom_option picom_options[] = {
     {"animation-open-exclude", required_argument, 814, NULL, "animation open exclude list"},
     {"animation-unmap-exclude", required_argument, 815, NULL, "animation unmap exclude list"},
     {"wm-support", required_argument, 816, NULL, "Set specific window manager support"},
+    {"active-opacity-exclude", required_argument, 817, NULL, "Exclude windows from being affected by active opacity"},
+    {"inactive-opacity-exclude", required_argument, 818, NULL, "Exclude windows from being affected by inactive opacity"},
 };
 // clang-format on
 
@@ -807,6 +809,12 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			}
 			break;
 		}
+		case 817:
+			condlst_add(&opt->active_opacity_blacklist, optarg);
+			break;
+		case 818:
+			condlst_add(&opt->inactive_opacity_blacklist, optarg);
+			break;
 		default: usage(argv[0], 1); break;
 #undef P_CASEBOOL
 		}
