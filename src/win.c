@@ -1135,7 +1135,7 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 		if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
 			if (win_is_focused_raw(ps, w)) {
 				opacity = w->opacity_set;
-			} else if (!win_is_focused_raw(ps, w)) {
+			} else if (!w->focused) {
 				if (ps->o.inactive_opacity == 1.0) {
 					opacity = w->opacity_set;
 				} else {
