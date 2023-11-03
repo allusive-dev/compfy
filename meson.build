@@ -7,13 +7,13 @@ cc = meson.get_compiler('c')
 version = 'v1.2.7'
 
 # use git describe if that's available
-git = find_program('git', required: false)
-if git.found()
-	gitv = run_command('git', 'rev-parse', '--short=5', 'HEAD', check: false)
-	if gitv.returncode() == 0
-		version = version
-	endif
-endif
+# git = find_program('git', required: false)
+# if git.found()
+# 	gitv = run_command('git', 'rev-parse', '--short=5', 'HEAD', check: false)
+# 	if gitv.returncode() == 0
+# 		version = version
+# 	endif
+# endif
 
 add_global_arguments('-DPICOM_VERSION="'+version+'"', language: 'c')
 
