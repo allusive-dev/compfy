@@ -787,6 +787,8 @@ enum wm_support parse_wm_support(const char *src) {
 		return WM_SUPPORT_NONE;
 	} else if (strcmp(src, "awesome") == 0) {
 		return WM_SUPPORT_AWESOME;
+	} else if (strcmp(src, "herb") == 0) {
+		return WM_SUPPORT_HERB;
 	} else if (strcmp(src, "dwm") == 0) {
 		return WM_SUPPORT_DWM;
 	}

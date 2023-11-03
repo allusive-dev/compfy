@@ -837,6 +837,8 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 
 				if (ps->o.support_for_wm == WM_SUPPORT_AWESOME) {
 					win_update_bounding_shape(ps, w);
+				} else if (ps->o.support_for_wm == WM_SUPPORT_HERB) {
+					win_update_bounding_shape(ps, w);
 				} else {
 					pixman_region32_clear(&w->bounding_shape);
 					pixman_region32_fini(&w->bounding_shape);

@@ -57,6 +57,7 @@ enum open_window_animation {
 enum wm_support {
 	WM_SUPPORT_NONE = 0,
 	WM_SUPPORT_AWESOME,
+	WM_SUPPORT_HERB,
 	WM_SUPPORT_DWM,
 	WM_SUPPORT_INVALID,
 };
