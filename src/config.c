@@ -799,7 +799,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
                    bool *fading_enable, bool *hasneg, win_option_mask_t *winopt_mask) {
 	// clang-format off
 	*opt = (struct options){
-	    .backend = BKEND_GLX,
+	    .backend = BKEND_XRENDER,
 	    .legacy_backends = false,
 	    .glx_no_stencil = false,
 	    .mark_wmwin_focused = false,
