@@ -867,25 +867,23 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation_running) {
 				w->animation_velocity_h = 0.0;
 			}
 
-			// if (!ps->root_desktop_switch_direction) {
-			// 	if (w->state == WSTATE_UNMAPPING || w->state == WSTATE_DESTROYING) {
-			// 		steps = 0;
-			// 		double new_opacity = clamp(
-			// 						w->opacity_target_old-w->animation_progress,
-			// 						w->opacity_target, 1);
+			// if (w->state == WSTATE_UNMAPPING || w->state == WSTATE_DESTROYING) {
+			// 	steps = 0;
+			// 	double new_opacity = clamp(
+			// 					w->opacity_target_old-w->animation_progress,
+			// 					w->opacity_target, 1);
 
-			// 		if (new_opacity < w->opacity)
-			// 			w->opacity = new_opacity;
+			// 	if (new_opacity < w->opacity)
+			// 		w->opacity = new_opacity;
 
-			// 	} else if (w->state == WSTATE_MAPPING) {
-			// 		steps = 0;
-			// 		double new_opacity = clamp(
-			// 							w->animation_progress,
-			// 							0.0, w->opacity_target);
+			// } else if (w->state == WSTATE_MAPPING) {
+			// 	steps = 0;
+			// 	double new_opacity = clamp(
+			// 						w->animation_progress,
+			// 						0.0, w->opacity_target);
 
-			// 		if (new_opacity > w->opacity)
-			// 			w->opacity = new_opacity;
-			// 	}
+			// 	if (new_opacity > w->opacity)
+			// 		w->opacity = new_opacity;
 			// }
 
 			*animation_running = true;
