@@ -1134,12 +1134,24 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 	} else if (w->opacity_is_set && ps->o.inactive_opacity_override) {
 		if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
 			if (win_is_focused_raw(ps, w)) {
-				opacity = w->opacity_set;
+				if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+					opacity = 1.0;
+				} else {
+					opacity = w->opacity_set;
+				}
 			} else if (!win_is_focused_raw(ps, w)) {
 				if (ps->o.inactive_opacity == 1.0) {
 					opacity = w->opacity_set;
 				} else {
-					opacity = ps->o.inactive_opacity;
+					if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+						if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+							opacity = 1.0;
+						} else {
+							opacity = ps->o.active_opacity;
+						}
+					} else {
+						opacity = ps->o.inactive_opacity;
+					}
 				}
 			}
 		} else {
@@ -1149,7 +1161,15 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 				if (ps->o.inactive_opacity == 1.0) {
 					opacity = w->opacity_set;
 				} else {
-					opacity = ps->o.inactive_opacity;
+					if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+						if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+							opacity = 1.0;
+						} else {
+							opacity = ps->o.active_opacity;
+						}
+					} else {
+						opacity = ps->o.inactive_opacity;
+					}
 				}
 			}
 		}
@@ -1160,9 +1180,21 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 		// Respect active_opacity only when the window is physically
 		// focused
 		if (win_is_focused_raw(ps, w)) {
-			opacity = ps->o.active_opacity;
+			if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+				opacity = 1.0;
+			} else {
+				opacity = ps->o.active_opacity;
+			}
 		} else if (!w->focused) {
-			opacity = ps->o.inactive_opacity;
+			if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+				if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
+					opacity = 1.0;
+				} else {
+					opacity = ps->o.active_opacity;
+				}
+			} else {
+				opacity = ps->o.inactive_opacity;
+			}
 		}
 	}
 
