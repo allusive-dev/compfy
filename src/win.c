@@ -1212,13 +1212,21 @@ bool win_should_dim(session_t *ps, const struct managed_win *w) {
 
 	if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
 		if (ps->o.inactive_dim > 0 && !win_is_focused_raw(ps, w)) {
-			return true;
+			if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+				return false;
+			} else {
+				return true;
+			}
 		} else {
 			return false;
 		}
 	} else {
-		if (ps->o.inactive_dim > 0 && !w->focused) {
-			return true;
+		if (ps->o.inactive_dim > 0 && !win_is_focused_raw(ps, w)) {
+			if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
+				return false;
+			} else {
+				return true;
+			}
 		} else {
 			return false;
 		}

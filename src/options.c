@@ -189,7 +189,7 @@ static const struct picom_option picom_options[] = {
     {"animation-unmap-exclude", required_argument, 815, NULL, "animation unmap exclude list"},
     {"wm-support", required_argument, 816, NULL, "Set specific window manager support"},
     {"active-opacity-exclude", required_argument, 817, NULL, "Exclude windows from being affected by active opacity"},
-    {"inactive-opacity-exclude", required_argument, 818, NULL, "Exclude windows from being affected by inactive opacity"},
+    {"inactive-exclude", required_argument, 818, NULL, "Exclude windows from being affected by inactive opacity"},
 };
 // clang-format on
 
