@@ -34,6 +34,8 @@
 #include "utils.h"
 #include "x.h"
 
+#include "wm_check.h"
+
 #ifdef CONFIG_DBUS
 #include "dbus.h"
 #endif
@@ -1126,13 +1128,16 @@ double win_calc_opacity_target(session_t *ps, const struct managed_win *w) {
 
 		return 0;
 	}
+
+	const char *wm = checkWindowManager();
+
 	// Try obeying opacity property and window type opacity firstly
 	if (w->has_opacity_prop) {
 		opacity = ((double)w->opacity_prop) / OPAQUE;
 	} else if (w->opacity_is_set && !ps->o.inactive_opacity_override) {
 		opacity = w->opacity_set;
 	} else if (w->opacity_is_set && ps->o.inactive_opacity_override) {
-		if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
+		if (strcmp(wm, "dwm") == 0) {
 			if (win_is_focused_raw(ps, w)) {
 				if (c2_match(ps, w, ps->o.active_opacity_blacklist, NULL)) {
 					opacity = 1.0;
@@ -1210,7 +1215,10 @@ bool win_should_dim(session_t *ps, const struct managed_win *w) {
 		return false;
 	}
 
-	if (ps->o.support_for_wm == WM_SUPPORT_DWM) {
+	const char *wm = checkWindowManager();
+
+	if (strcmp(wm, "dwm") == 0) {
+		// printf("DWM True\n");
 		if (ps->o.inactive_dim > 0 && !win_is_focused_raw(ps, w)) {
 			if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
 				return false;
@@ -1221,6 +1229,7 @@ bool win_should_dim(session_t *ps, const struct managed_win *w) {
 			return false;
 		}
 	} else {
+		// printf("DWM False\n");
 		if (ps->o.inactive_dim > 0 && !win_is_focused_raw(ps, w)) {
 			if (c2_match(ps, w, ps->o.inactive_opacity_blacklist, NULL)) {
 				return false;

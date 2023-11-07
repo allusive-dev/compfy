@@ -805,7 +805,8 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			if (wm >= WM_SUPPORT_INVALID) {
 				log_warn("Invalid window manager %s, ignoring.", optarg);
 			} else {
-				opt->support_for_wm = wm;
+				log_warn("wm-support is deprecated. Your window manager will now be detected and have patches applied automatically");
+				opt->support_for_wm = WM_SUPPORT_NONE;
 			}
 			break;
 		}

@@ -601,7 +601,8 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 			log_fatal("Invalid window manager name passed %s", sval);
 			goto err;
 		}
-		opt->support_for_wm = wm;
+		log_warn("wm-support is deprecated. Your window manager will now be detected and have patches applied automatically");
+		opt->support_for_wm = WM_SUPPORT_NONE;
 	}
 	// --opacity-rule
 	parse_cfg_condlst_opct(opt, &cfg, "opacity-rule");
