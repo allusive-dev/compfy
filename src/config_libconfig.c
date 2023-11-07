@@ -468,6 +468,19 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 			goto err;
 		}
 	}
+
+	const char *wmNotice = checkWindowManager();
+
+	if (strcmp(wmNotice, "awesome") == 0) {
+		log_warn("Looks like you are using AwesomeWM. Applying Patches");
+	} else if (strcmp(wmNotice, "herb") == 0) {
+		log_warn("Looks like you are using HerbstluftWM. Applying Patches");
+	} else if (strcmp(wmNotice, "dwm") == 0) {
+		log_warn("Looks like you are using DWM. Applying Patches");
+	} else {
+		log_warn("Looks like your WM, %s does not have any patches avaliable. This is not an Error.", wmNotice);
+	}
+
 	// --log-level
 	if (config_lookup_string(&cfg, "log-level", &sval)) {
 		auto level = string_to_log_level(sval);
