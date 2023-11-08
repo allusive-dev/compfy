@@ -468,21 +468,6 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 			goto err;
 		}
 	}
-
-	const char *wmNotice = checkWindowManager();
-
-	if (strcmp(wmNotice, "awesome") == 0) {
-		log_warn("Looks like you are using AwesomeWM. Applying Patches");
-	} else if (strcmp(wmNotice, "herb") == 0) {
-		log_warn("Looks like you are using HerbstluftWM. Applying Patches");
-	} else if (strcmp(wmNotice, "dwm") == 0) {
-		log_warn("Looks like you are using DWM. Applying Patches");
-	} else if (strcmp(wmNotice, "NULL") == 0) {
-		log_warn("Your not using a Display Manager. Add this to your shells's rc file to ensure you will get the right patches.\n export DESKTOP_SESSION='your-window-manager'\n");
-	} else {
-		log_warn("Looks like your WM, %s does not have any patches avaliable. This is not an Error.", wmNotice);
-	}
-
 	// --log-level
 	if (config_lookup_string(&cfg, "log-level", &sval)) {
 		auto level = string_to_log_level(sval);
@@ -616,8 +601,7 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 			log_fatal("Invalid window manager name passed %s", sval);
 			goto err;
 		}
-		log_warn("wm-support is deprecated. Your window manager will now be detected and have patches applied automatically");
-		opt->support_for_wm = WM_SUPPORT_NONE;
+		opt->support_for_wm = wm;
 	}
 	// --opacity-rule
 	parse_cfg_condlst_opct(opt, &cfg, "opacity-rule");
