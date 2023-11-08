@@ -32,7 +32,7 @@ Here is a full list of features that are now avaliable going ahead from `1.0`
 - Blur rules. Background blurring is now done on a whitelist basis to reduce hardware consumption.
 - (As of `1.2.3`) fixes rounded corner issues on AwesomeWM.
 - (As of `1.2.4`) A New option, `wm-support` has been added. Applies patches for ("awesome", "dwm", "herb"). "herb" being HerbstluftWM.
-- (As of `1.3.0`) Adds `inactive-opacity-exclude` and `active-opacity-exclude`. See Wiki or Donument for more information.
+- (As of `1.3.0`) Adds `inactive-exclude` and `active-opacity-exclude`. See Wiki or Donument for more information.
 
 ## What Is This?
 
