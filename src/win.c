@@ -766,26 +766,22 @@ void win_process_update_flags(session_t *ps, struct managed_win *w) {
 				w->g.height = (uint16_t)round(w->animation_h);
 
 			} else {
-				if (ps->o.support_for_wm == WM_SUPPORT_HERB) {
+                w->animation_dest_center_x =
+                    w->pending_g.x + w->pending_g.width * 0.5;
+                w->animation_dest_center_y =
+                    w->pending_g.y + w->pending_g.height * 0.5;
 
-					if (w->pending_g.x < -(w->g.width) && w->pending_g.y < -(w->g.height)) {
-						log_warn("Animation geometry postion update cancelled");
-					} else {
-						w->animation_dest_center_x =
-							w->pending_g.x + w->pending_g.width * 0.5;
-						w->animation_dest_center_y =
-							w->pending_g.y + w->pending_g.height * 0.5;
-						w->animation_dest_w = w->pending_g.width;
-						w->animation_dest_h = w->pending_g.height;
-					}
-				} else {
-					w->animation_dest_center_x =
-						w->pending_g.x + w->pending_g.width * 0.5;
-					w->animation_dest_center_y =
-						w->pending_g.y + w->pending_g.height * 0.5;
-					w->animation_dest_w = w->pending_g.width;
-					w->animation_dest_h = w->pending_g.height;
-				}
+                bool herb = ps->o.support_for_wm == WM_SUPPORT_HERB;
+                bool hidingTab = w->pending_g.x < -(w->g.width) && w->pending_g.y < -(w->g.height);
+                bool unhidingTab = w->g.x < -(w->g.width) && w->g.y < -(w->g.height);
+
+                if (herb && (hidingTab || unhidingTab)) {
+                    w->animation_center_x = w->animation_dest_center_x;
+                    w->animation_center_y = w->animation_dest_center_y;
+                };
+
+                w->animation_dest_w = w->pending_g.width;
+                w->animation_dest_h = w->pending_g.height;
 			}
 
 			w->g.border_width = w->pending_g.border_width;
