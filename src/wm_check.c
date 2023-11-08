@@ -5,7 +5,7 @@
 const char *checkWindowManager() {
     char *desktopSession = getenv("DESKTOP_SESSION");
     if (desktopSession == NULL) {
-        return "Not Found";
+        return "NULL";
     } else {
         if (strstr(desktopSession, "xmonad") != NULL) {
             return "xmonad";
@@ -16,7 +16,7 @@ const char *checkWindowManager() {
         } else if (strstr(desktopSession, "dwm") != NULL) {
             return "dwm";
         } else {
-            return desktopSession;
+            return "notFound";
         }
     }
 }

@@ -477,6 +477,8 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		log_warn("Looks like you are using HerbstluftWM. Applying Patches");
 	} else if (strcmp(wmNotice, "dwm") == 0) {
 		log_warn("Looks like you are using DWM. Applying Patches");
+	} else if (strcmp(wmNotice, "NULL") == 0) {
+		log_warn("If you are seeing this error it probably means you are not using a Display Manager so your WM cannot be read. See Issue #25 on GitHub");
 	} else {
 		log_warn("Looks like your WM, %s does not have any patches avaliable. This is not an Error.", wmNotice);
 	}
