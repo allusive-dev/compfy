@@ -766,12 +766,26 @@ void win_process_update_flags(session_t *ps, struct managed_win *w) {
 				w->g.height = (uint16_t)round(w->animation_h);
 
 			} else {
-				w->animation_dest_center_x =
-				    w->pending_g.x + w->pending_g.width * 0.5;
-				w->animation_dest_center_y =
-				    w->pending_g.y + w->pending_g.height * 0.5;
-				w->animation_dest_w = w->pending_g.width;
-				w->animation_dest_h = w->pending_g.height;
+				if (ps->o.support_for_wm == WM_SUPPORT_HERB) {
+
+					if (w->pending_g.x < -(w->g.width) && w->pending_g.y < -(w->g.height)) {
+						log_warn("Animation geometry postion update cancelled");
+					} else {
+						w->animation_dest_center_x =
+							w->pending_g.x + w->pending_g.width * 0.5;
+						w->animation_dest_center_y =
+							w->pending_g.y + w->pending_g.height * 0.5;
+						w->animation_dest_w = w->pending_g.width;
+						w->animation_dest_h = w->pending_g.height;
+					}
+				} else {
+					w->animation_dest_center_x =
+						w->pending_g.x + w->pending_g.width * 0.5;
+					w->animation_dest_center_y =
+						w->pending_g.y + w->pending_g.height * 0.5;
+					w->animation_dest_w = w->pending_g.width;
+					w->animation_dest_h = w->pending_g.height;
+				}
 			}
 
 			w->g.border_width = w->pending_g.border_width;
