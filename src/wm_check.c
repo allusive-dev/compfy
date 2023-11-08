@@ -16,7 +16,7 @@ const char *checkWindowManager() {
         } else if (strstr(desktopSession, "dwm") != NULL) {
             return "dwm";
         } else {
-            return desktopSession;
+            return "error";
         }
     }
 }
