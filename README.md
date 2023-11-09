@@ -57,6 +57,26 @@ $ ninja -C build
 $ ninja -C build install
 ```
 
+Dependencies:
+
+```
+libconfig
+libdbus
+libev
+libglvnd
+libx11
+libxcb
+libxdg-basedir
+pcre
+pixman
+xcb-util-image
+xcb-util-renderutil
+gcc (make)
+git (make)
+meson (make)
+ninja (make)
+```
+
 ### Arch Linux or other Arch based distros
 
 ```
