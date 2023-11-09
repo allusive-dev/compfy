@@ -521,10 +521,12 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	// --fade-exclude
 	parse_cfg_condlst(&cfg, &opt->fade_blacklist, "fade-exclude");
 
-	log_warn("If you are using AwesomeWM, DWM or Herbstluftwm please set this option in your config\n"
-			 "\n"
-			 "wm-support = 'awesome'\n"
-			 "# Avaliable options are, 'awesome', 'herb', 'dwm'\n");
+	printf("\n"
+		   "If you are using AwesomeWM, DWM or Herbstluftwm please set this option in your config\n"
+		   "\n"
+		   "wm-support = 'awesome'\n"
+		   "# Avaliable options are, 'awesome', 'herb', 'dwm'\n"
+		   "\n");
 
 	// --animations
 	lcfg_lookup_bool(&cfg, "animations", &opt->animations);
