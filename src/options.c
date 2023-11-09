@@ -108,7 +108,7 @@ static const struct picom_option picom_options[] = {
     {"benchmark"                   , required_argument, 293, NULL          , "Benchmark mode. Repeatedly paint until reaching the specified cycles."},
     {"benchmark-wid"               , required_argument, 294, NULL          , "Specify window ID to repaint in benchmark mode. If omitted or is 0, the whole"
                                                                              " screen is repainted."},
-    {"blur-background-exclude"     , required_argument, 296, "COND"        , "Exclude conditions for background blur."},
+    {"blur-exclude"     , required_argument, 296, "COND"        , "Exclude conditions for background blur."},
     {"active-opacity"              , required_argument, 297, NULL          , "Default opacity for active windows. (0.0 - 1.0)"},
     {"glx-no-rebind-pixmap"        , no_argument      , 298, NULL          , NULL},
     {"glx-swap-method"             , required_argument, 299, NULL          , NULL},
@@ -176,20 +176,21 @@ static const struct picom_option picom_options[] = {
     {"no-ewmh-fullscreen"          , no_argument      , 803, NULL          , "Do not use EWMH to detect fullscreen windows. Reverts to checking if a "
                                                                              "window is fullscreen based only on its size and coordinates."},
     {"animations", no_argument, 804, NULL, "Toggles Animations"},
-    {"animation-stiffness", required_argument, 805, NULL, "stiffness"},
-    {"animation-dampening", required_argument, 806, NULL, "dampening"},
-    {"animation-window-mass", required_argument, 807, NULL, "window mass"},
-    {"animation-clamping", no_argument, 808, NULL, "clamping"},
+    {"animation-stiffness", required_argument, 805, NULL, "animation stiffness"},
+    {"animation-dampening", required_argument, 806, NULL, "animation dampening"},
+    {"animation-window-mass", required_argument, 807, NULL, "animation window mass"},
+    {"animation-clamping", no_argument, 808, NULL, "toggle animation clamping"},
     {"animation-for-open-window", required_argument, 809, NULL, "open window animation"},
     // {"animation-for-transient-window", required_argument, 810, NULL, "transient window animation"},
     {"animation-for-unmap-window", required_argument, 811, NULL, "unmap window animation"},
     {"corners-rule", required_argument, 812, NULL, "rounded corner rules"},
-    {"blur-rule", required_argument, 813, NULL, "blur rules"},
+    {"blur-include", required_argument, 813, NULL, "blur rules"},
     {"animation-open-exclude", required_argument, 814, NULL, "animation open exclude list"},
     {"animation-unmap-exclude", required_argument, 815, NULL, "animation unmap exclude list"},
     {"wm-support", required_argument, 816, NULL, "Set specific window manager support"},
     {"active-opacity-exclude", required_argument, 817, NULL, "Exclude windows from being affected by active opacity"},
     {"inactive-exclude", required_argument, 818, NULL, "Exclude windows from being affected by inactive opacity"},
+    {"blur-whitelist", no_argument, 819, NULL, "Toggles Blur Whitelisting"},
 };
 // clang-format on
 
@@ -815,6 +816,7 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 		case 818:
 			condlst_add(&opt->inactive_opacity_blacklist, optarg);
 			break;
+		P_CASEBOOL(819, blur_whitelist);
 		default: usage(argv[0], 1); break;
 #undef P_CASEBOOL
 		}

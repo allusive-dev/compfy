@@ -143,12 +143,14 @@ static void win_update_focused(session_t *ps, struct managed_win *w) {
 
 		// Use wintype_focus, and treat WM windows and override-redirected
 		// windows specially
-		if (ps->o.wintype_option[w->window_type].focus ||
-		    (ps->o.mark_wmwin_focused && w->wmwin) ||
-		    (ps->o.mark_ovredir_focused && w->base.id == w->client_win && !w->wmwin) ||
-		    (w->a.map_state == XCB_MAP_STATE_VIEWABLE &&
-		     c2_match(ps, w, ps->o.focus_blacklist, NULL))) {
+		if (ps->o.wintype_option[w->window_type].focus) {
 			w->focused = true;
+		} else if (!ps->o.wintype_option[w->window_type].focus) {
+			w->focused = false;
+		}
+
+		if (ps, w, ps->o.focus_blacklist, NULL) {
+			log_warn("Focus exclude is deprecated. Please use either 'inactive-exclude' or 'active-exclude'");
 		}
 
 		// If window grouping detection is enabled, mark the window active if
@@ -1508,14 +1510,21 @@ static void win_determine_blur_background(session_t *ps, struct managed_win *w) 
 		if (!ps->o.wintype_option[w->window_type].blur_background) {
 			log_debug("Blur background disabled by wintypes");
 			blur_background_new = false;
-		} else if (c2_match(ps, w, ps->o.blur_background_blacklist, NULL)) {
-			log_debug("Blur background disabled by "
-			          "blur-background-exclude");
-			blur_background_new = false;
-		} else if (c2_match(ps, w, ps->o.blur_rules, NULL)) {
-			blur_background_new = true;
-		} else {
-			blur_background_new = false;
+		}
+		if (!ps->o.blur_whitelist) {
+			if (c2_match(ps, w, ps->o.blur_background_blacklist, NULL)) {
+				log_debug("Blur background disabled by "
+						"blur-exclude");
+				blur_background_new = false;
+			} else {
+				blur_background_new = true;
+			}
+		} else if (ps->o.blur_whitelist) {
+			if (c2_match(ps, w, ps->o.blur_rules, NULL)) {
+				blur_background_new = true;
+			} else {
+				blur_background_new = false;
+			}
 		}
 	}
 

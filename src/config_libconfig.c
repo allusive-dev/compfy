@@ -578,22 +578,23 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	lcfg_lookup_bool(&cfg, "animation-clamping", &opt->animation_clamping);
 	// --focus-exclude
 	parse_cfg_condlst(&cfg, &opt->focus_blacklist, "focus-exclude");
+
 	// --invert-color-include
 	parse_cfg_condlst(&cfg, &opt->invert_color_list, "invert-color-include");
 	// --blur-background-exclude
-	parse_cfg_condlst(&cfg, &opt->blur_background_blacklist, "blur-background-exclude");
+	parse_cfg_condlst(&cfg, &opt->blur_background_blacklist, "blur-exclude");
 	// animation exclude
 	parse_cfg_condlst(&cfg, &opt->animation_open_blacklist, "animation-open-exclude");
 	// animation exclude
 	parse_cfg_condlst(&cfg, &opt->animation_unmap_blacklist, "animation-unmap-exclude");
 	// active opacity exclude
-	parse_cfg_condlst(&cfg, &opt->active_opacity_blacklist, "active-opacity-exclude");
+	parse_cfg_condlst(&cfg, &opt->active_opacity_blacklist, "active-exclude");
 	// inactive opacity exclude
 	parse_cfg_condlst(&cfg, &opt->inactive_opacity_blacklist, "inactive-exclude");
 	// corners-rule
 	parse_cfg_condlst_corner(opt, &cfg, "corners-rule");
 	// blur-rule
-	parse_cfg_condlst(&cfg, &opt->blur_rules, "blur-rule");
+	parse_cfg_condlst(&cfg, &opt->blur_rules, "blur-include");
 	// wm-support
 	if (config_lookup_string(&cfg, "wm-support", &sval)) {
 		enum wm_support wm = parse_wm_support(sval);
@@ -603,6 +604,7 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 		}
 		opt->support_for_wm = wm;
 	}
+	lcfg_lookup_bool(&cfg, "blur-whitelist", &opt->blur_whitelist);
 	// --opacity-rule
 	parse_cfg_condlst_opct(opt, &cfg, "opacity-rule");
 	// --unredir-if-possible-exclude

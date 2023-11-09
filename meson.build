@@ -1,10 +1,10 @@
-project('picom', 'c', version: '1.3.2',
+project('picom', 'c', version: '1.4.0',
         default_options: ['c_std=c11', 'warning_level=1'])
 
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v1.3.2'
+version = 'v1.4.0'
 
 # use git describe if that's available
 # git = find_program('git', required: false)

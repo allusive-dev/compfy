@@ -232,6 +232,8 @@ typedef struct options {
 	// Wm Support
 	enum wm_support support_for_wm;
 
+	bool blur_whitelist;
+
 	// === Opacity ===
 	/// Default opacity for inactive windows.
 	/// 32-bit integer with the format of _NET_WM_WINDOW_OPACITY.

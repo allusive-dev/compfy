@@ -860,6 +860,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 
 		.corner_rules = NULL,
 		.blur_rules = NULL,
+		.blur_whitelist = true,
 
 		.support_for_wm = WM_SUPPORT_NONE,
 
