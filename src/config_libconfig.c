@@ -520,14 +520,6 @@ char *parse_config_libconfig(options_t *opt, const char *config_file, bool *shad
 	parse_cfg_condlst(&cfg, &opt->shadow_clip_list, "clip-shadow-above");
 	// --fade-exclude
 	parse_cfg_condlst(&cfg, &opt->fade_blacklist, "fade-exclude");
-
-	printf("\n"
-		   "If you are using AwesomeWM, DWM or Herbstluftwm please set this option in your config\n"
-		   "\n"
-		   "wm-support = 'awesome'\n"
-		   "# Avaliable options are, 'awesome', 'herb', 'dwm'\n"
-		   "\n");
-
 	// --animations
 	lcfg_lookup_bool(&cfg, "animations", &opt->animations);
 	// --animation-for-open-window
