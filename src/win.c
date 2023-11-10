@@ -3191,7 +3191,7 @@ win_is_fullscreen_xcb(xcb_connection_t *c, const struct atom *a, const xcb_windo
 void win_set_flags(struct managed_win *w, uint64_t flags) {
 	log_debug("Set flags %" PRIu64 " to window %#010x (%s)", flags, w->base.id, w->name);
 	if (unlikely(w->state == WSTATE_DESTROYING)) {
-		log_error("Flags set on a destroyed window %#010x (%s)", w->base.id, w->name);
+		// log_error("Flags set on a destroyed window %#010x (%s)", w->base.id, w->name);
 		return;
 	}
 
