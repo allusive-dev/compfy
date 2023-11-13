@@ -67,7 +67,7 @@ libglvnd
 libx11
 libxcb
 libxdg-basedir
-pcre
+pcre2
 pixman
 xcb-util-image
 xcb-util-renderutil
