@@ -69,6 +69,7 @@ libxcb
 libxdg-basedir
 pcre2
 pixman
+uthash
 xcb-util-image
 xcb-util-renderutil
 gcc (make)
