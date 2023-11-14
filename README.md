@@ -1,7 +1,9 @@
 # picom-allusive
 See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 
-
+<br>
+<br>
+<br>
 
 
 ## Update
@@ -10,7 +12,9 @@ See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 
 [Thread - Issue 34](https://github.com/allusive-dev/picom-allusive/issues/34)
 
-
+<br>
+<br>
+<br>
 
 
 Want to chat or maybe help bug test? Contatct me here:
