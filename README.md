@@ -6,7 +6,7 @@ See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 <br>
 
 
-## Update
+# Update
 
 **If you use this package whatsoever or are intersted in its development, want to support future development or anything, please join the thread below where big changes to this package going ahead are being decided!**
 
