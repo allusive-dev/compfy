@@ -1,6 +1,18 @@
 # picom-allusive
 See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 
+
+
+
+## Update
+
+**If you use this package whatsoever or are intersted in its development, want to support future development or anything, please join the thread below where big changes to this package going ahead are being decided!**
+
+[Thread - Issue 34](https://github.com/allusive-dev/picom-allusive/issues/34)
+
+
+
+
 Want to chat or maybe help bug test? Contatct me here:
 
 [![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
