@@ -1,15 +1,4 @@
 // SPDX-License-Identifier: MIT
-/*
- * Compton - a compositor for X11
- *
- * Based on `xcompmgr` - Copyright (c) 2003, Keith Packard
- *
- * Copyright (c) 2011-2013, Christopher Jeffrey
- * Copyright (c) 2018, Yuxuan Shui <yshuiv7@gmail.com>
- *
- * See LICENSE-mit for more information.
- *
- */
 
 #pragma once
 
@@ -245,7 +234,6 @@ typedef struct session {
 	bool redraw_needed;
 
 	/// Cache a xfixes region so we don't need to allocate it every time.
-	/// A workaround for yshui/picom#301
 	xcb_xfixes_region_t damaged_region;
 	/// The region needs to painted on next paint.
 	region_t *damage;

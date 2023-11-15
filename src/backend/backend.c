@@ -75,8 +75,8 @@ void handle_device_reset(session_t *ps) {
 	//  So here we blindly wait 5 seconds and hope ourselves best of the luck.
 	sleep(5);
 
-	// Reset picom
-	log_info("Resetting picom after device reset");
+	// Reset compfy
+	log_info("Resetting compfy after device reset");
 	ev_break(ps->loop, EVBREAK_ALL);
 }
 

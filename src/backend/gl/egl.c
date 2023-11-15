@@ -19,7 +19,7 @@
 #include "compiler.h"
 #include "config.h"
 #include "log.h"
-#include "picom.h"
+#include "compfy.h"
 #include "utils.h"
 #include "x.h"
 

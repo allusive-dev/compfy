@@ -1,0 +1,696 @@
+.nh
+.TH Compfy
+.SH Guide for Configuring Compfy
+.SS Config can be placed at either \fB\fC~/.config/compfy.conf\fR or \fB\fC~/.config/compfy/compfy.conf\fR
+
+.SH Options
+.SH corner-radius
+.PP
+\fIBy default this is set to 12 in the sample config\fP
+
+.PP
+Adjusts the window corner rounding in pixels.
+
+.SH rounded-corners-exclude []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Here you can declare rules of what windows will not have their borders rounded. This can be good for some games that go full screen but still have rounded borders.
+
+.PP
+Here is an example
+
+.PP
+.RS
+
+.nf
+rounded-corners-exclude = [
+  "class_g = 'Alacritty'",
+];
+
+.fi
+.RE
+
+.SH corners-rule []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Within this rule-set you can explicitly declare the corner-radius of individual windows based on their name or class name attributes.
+
+.PP
+It functions in a similar way to \fB\fCopacity-rule\fR in that the number you put before the window name is the amount of rounding you want applied to that window.
+
+.PP
+Currently you can only use number 1-100. This may be fixed in later updates.
+
+.PP
+.RS
+
+.nf
+corners-rule = [
+  "20:class_g    = 'Polybar'",
+  "15:class_g    = 'Dunst'",
+];
+
+.fi
+.RE
+
+.SH shadow
+.PP
+\fIBy default this will be set to \fB\fCfalse\fR in the sample config\fP
+
+.PP
+Enables shadows for windows.
+
+.PP
+Shadows tend to be a bit finicky on some window managers, so make sure to play around with it and see what is best for you.
+
+.SH shadow-radius
+.PP
+\fIBy default this is set to 12\fP
+
+.PP
+Shadow radius/roundness in pixels.
+
+.SH shadow-opacity
+.PP
+\fIBy default this is set to 0.75 (0.0 ~ 1.0)\fP
+
+.PP
+Set the opacity of the window shadow.
+
+.SH shadow-offset-x
+.PP
+\fIBy default this is set to -15 (-100 ~ 100)\fP
+
+.PP
+Set the offset of the shadow along the x-axis.
+
+.SH shadow-offset-y
+.PP
+\fIBy default this is set to -15 (-100 ~ 100)\fP
+
+.PP
+Set the offset of the shadow along the y-axis.
+
+.SH shadow-color
+.PP
+The color for shadows as a HEX code.
+
+.PP
+.RS
+
+.nf
+shadow-color = "#101010";
+
+.fi
+.RE
+
+.SH shadow-exclude []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Declare windows which will not render a shadow.
+
+.SH fading
+.PP
+\fIBy default this is set to \fB\fCtrue\fR in the sample config\fP
+
+.PP
+\fIFade windows in/out when opening/closing and when opacity changes\fP
+
+.PP
+Fading is required for unmap animations to work.
+
+.SH fade-in-step
+.PP
+\fIBy default this is set to \fB\fC0.03\fR in the sample config\fP
+
+.PP
+\fIOpacity change between steps while fading in. (0.01 - 1.0)\fP
+
+.PP
+Increasing this value will result in faster fading in of windows.
+Decreasing makes the fading in of windows take longer. (This does not means the animations take longer, just the fading).
+
+.SH fade-out-step
+.PP
+\fIBy default this is set to \fB\fC0.03\fR in the sample config\fP
+
+.PP
+\fIOpacity change between steps while fading out. (0.01 - 1.0)\fP
+
+.PP
+Increasing this value will result in faster fading out AND animating out of windows.
+Decreasing this makes fading and animating out take longer.
+
+.SH fade-delta
+.PP
+\fIBy default this is set to \fB\fC5\fR\fP
+
+.PP
+\fIThe time between steps in fade step, in milliseconds. ( > 0)\fP
+
+.PP
+Currently unsure what this does but it is recommended to keep it at the default.
+
+.SH fade-exclude []
+.PP
+\fIEmpty by default\fP
+
+.PP
+\fISpecify a list of windows that should not be faded.\fP
+
+.PP
+.RS
+
+.nf
+fade-exclude = [
+  "class_g = 'foo'"
+]
+
+.fi
+.RE
+
+.SH inactive-opacity
+.PP
+\fIBy default this is set to 1.0 (0.0 - 1.0)\fP
+
+.PP
+Declares the opacity of unfocused windows.
+
+.SH frame-opacity
+.PP
+\fIBy default this is set to 1.0 (0.0 - 1.0)\fP
+
+.PP
+Declares the opacity of window borders and title-bars.
+
+.SH inactive-opacity-override
+.PP
+\fIBy default this is set to false (true/false)\fP
+
+.PP
+If this is not enabled then windows which have their opacity set in \fB\fCopacity-rule\fR or \fB\fCwintypes\fR will not be affected by \fB\fCinactive-opacity\fR\&. Enable this to fix that.
+
+.SH active-opacity
+.PP
+\fIBy default this is set to 1.0 (0.0 - 1.0)\fP
+
+.PP
+Declares the opacity of focused windows.
+
+.SH active-opacity-exclude []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+A list of windows that should never have their opacity changed by \fB\fCactive-opacity\fR when focused.
+
+.SH inactive-exclude []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+A list of windows that should have their \fB\fCinactive-opacity\fR set to whatever the \fB\fCactive-opacity\fR is. Unless the window is also in \fB\fCactive-opacity-exclude\fR then it will be set to \fB\fC1.0\fR or if it is set in \fB\fCopacity-rule\fR it will use the opacity set there as the \fB\fCinactive-opacity\fR\&.
+
+.PP
+Also excludes inactive dimming.
+
+.SH focus-exclude []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Declare windows that should always be considered to be focused by the compositor.
+
+.SH opacity-rule []
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Declare windows that should have their opacity hard set. As an example. Where 95 is can be anything between (0 - 100)
+
+.PP
+.RS
+
+.nf
+opacity-rule = [
+  "95:class_g    = 'Alacritty'",
+];
+
+.fi
+.RE
+
+.SH blur-background
+.PP
+\fIBy default this is set to false\fP
+
+.PP
+Toggle background blurring
+
+.SH blur-method
+.PP
+\fIBy default this is set to \fB\fCnone\fR\fP
+
+.PP
+Selects the blur method. Available options are:
+
+.RS
+.IP \(bu 2
+none
+.IP \(bu 2
+kernel
+.IP \(bu 2
+gaussian
+.IP \(bu 2
+box
+.IP \(bu 2
+dual_kawase (most used)
+
+.RE
+
+.SH blur-radius
+.PP
+\fIBy default this is set to 3\fP
+
+.PP
+Sets the radius of the blur.
+
+.SH blur-strength
+.PP
+\fIBy default this is set to 5\fP
+
+.PP
+Sets the strength/intensity of the blur.
+
+.SH blur-whitelist
+.PP
+\fIDefaults to \fB\fCtrue\fR (true / false)\fP
+
+.PP
+Toggle whether you want to use blurring on a whitelist basis(blur-include) or a blacklist basis(blur-exclude).
+
+.SH blur-include
+.PP
+\fIBy default this rule set is empty\fP
+
+.PP
+This acts a a whitelist for blurring the background of windows. See the example below.
+Using a whitelist helps to reduce hardware consumption.
+
+.PP
+.RS
+
+.nf
+blur-rule = [
+  "class_g = 'kitty'",
+  "class_g = 'Emacs'",
+  "class_g = 'Rofi'"
+];
+
+.fi
+.RE
+
+.SH blur-exclude
+.PP
+\fIBy default this rule set is empty\fP
+
+.PP
+When used with \fB\fCblur-whitelist = false;\fR this will exclude specific windows from having their background blurred.
+
+.PP
+.RS
+
+.nf
+blur-exclude = [
+  "class_g = 'Firefox'"
+];
+
+.fi
+.RE
+
+.PP
+The part of the wiki you have probably all come for.
+
+.SH animations
+.PP
+\fIBy default this option is set to \fB\fCtrue\fR\fP(true/false)
+
+.PP
+\fIToggles whether animations should be used for windows\fP
+
+.SH animation-stiffness
+.PP
+\fIBy default this is set to \fB\fC100\fR\fP
+
+.PP
+\fIChanges the stiffness of animations\fP
+
+.PP
+What stiffness basically is inferring is how much the window geometry will be stretched when opening/closing windows. It's best illustrated in the video below.
+
+.PP
+With a higher stiffness the windows go to the final animation position faster resulting in a snappier looking transition.
+
+.SH animation-window-mass
+.PP
+\fIBy default this is set to \fB\fC0.5\fR\fP
+
+.PP
+\fIChanges the mass of windows\fP
+
+.PP
+Modifying the mass of windows makes them virtually heavier and therefore slower to animate.
+
+.SH animation-dampening
+.PP
+\fIBy default this is set to \fB\fC10\fR\fP
+
+.PP
+\fIChanges the dampening applied to windows during the animation\fP
+
+.PP
+This setting basically does what it says. It dampens the animation of windows.
+
+.PP
+The more windows are dampened, the slower/softer they come into and out of view.
+
+.SH animation-clamping
+.PP
+\fIBy default this is set to \fB\fCfalse\fR\fP (true/false)
+
+.PP
+\fIToggles window clamping\fP
+
+.PP
+Stop the animation from making the window exceed its set geometry. Shoutout to @thecodsman
+\[la]https://github.com/thecodsman\[ra] for finding this out.
+
+.PP
+Basically if you are using a animation setting that would make the window extend larger than it would be after the animation has played then it will cut the animation off once the window reaches its physical geometry.
+
+.SH animation-for-open-window
+.PP
+\fIBy default this is set to \fB\fCzoom\fR\fP
+
+.PP
+Options:
+- \fB\fCfly-in\fR \fINewly opened windows will fly in from a random position on the edge of the screen\fP
+- \fB\fCzoom\fR \fINewly opened windows will zoom in from the center point of wherever they were going to appear\fP
+- \fB\fCslide-up\fR \fINewly opened windows will slide up from the bottom of screen\fP
+- \fB\fCslide-down\fR \fINewly opened windows will slide down from the top of the screen\fP
+- \fB\fCslide-left\fR \fINewly opened windows will slide in from the right of where they are opened\fP
+- \fB\fCslide-right\fR \fINewly opened windows will slide in from the left of where they are opened\fP
+- \fB\fCauto\fR \fINewly opened windows will not have an animation\fP
+
+.PP
+Feel free to play around with these options to see which animation you prefer.
+
+.SH animation-for-unmap-window
+.PP
+\fIBy default this is set to \fB\fCzoom\fR\fP
+
+.PP
+\fIDefines the animation for when windows are closed/killed\fP
+
+.PP
+Options:
+- \fB\fCfly-in\fR \fINewly closed windows will fly out to a random position on the edge of the screen\fP
+- \fB\fCzoom\fR \fINewly closed windows will zoom out from the center point of the window\fP
+- \fB\fCslide-up\fR \fINewly closed windows will slide up from where they were closed\fP
+- \fB\fCslide-down\fR \fINewly closed windows will slide down from where they were closed\fP
+- \fB\fCslide-left\fR \fINewly closed windows will slide out from the right of where they are opened\fP
+- \fB\fCslide-right\fR \fINewly closed windows will slide out from the left of where they are opened\fP
+- \fB\fCauto\fR \fINewly closed windows will not have an animation\fP
+
+.PP
+Feel free to play around with these options to see which animation you prefer.
+
+.SH animation-open-exclude
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Define windows that will not render any open animation.
+
+.PP
+Example
+
+.PP
+.RS
+
+.nf
+animation-open-exclude = [
+  "class_g = 'Alacritty'"
+];
+
+.fi
+.RE
+
+.SH animation-unmap-exclude
+.PP
+\fIBy default this rule-set is empty\fP
+
+.PP
+Define windows that will not render any closing animation.
+
+.PP
+Example
+
+.PP
+.RS
+
+.nf
+animation-unmap-exclude = [
+  "class_g = 'Alacritty'"
+];
+
+.fi
+.RE
+
+
+.SH Using wintypes.
+.PP
+In picom you can set many options on the basis of what the windows 'type' is.
+
+.PP
+Listed below are the available types.
+I can't say what applications or windows all of these link to so you will have to play with them to find what works.
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  desktop = {};
+  dock = {};
+  toolbar = {};
+  menu = {};
+  utility = {};
+  splash = {};
+  dialog = {};
+  normal = {};
+  dropdown_menu = {};
+  popup_menu = {};
+  tooltip = {};
+  notification = {};
+  combo = {};
+  dnd = {};
+}
+
+.fi
+.RE
+
+.SH Wintype Options
+.PP
+You can pass multiple options into one window type. Below is an example:
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  normal = { shadow = true; fade = false; animation = "slide-down"; };
+}
+
+.fi
+.RE
+
+.PP
+Below is all the options you can pass into wintypes.
+
+.SS shadow
+.PP
+Toggle shadows. ( true / false )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  popup_menu = { shadow = true; };
+}
+
+.fi
+.RE
+
+.SS fade
+.PP
+Toggle fading. ( true / false )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  popup_menu = { fade = false; };
+}
+
+.fi
+.RE
+
+.SS focus
+.PP
+If focus was true, then that wintype would always be considered focus and therefore not be affected by inactive-opacity or inactive-dim.
+If false, it is always considered inactive/unfocused and then always applies those effects.
+
+.PP
+( true / false )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  menu = { focus = true; };
+}
+
+.fi
+.RE
+
+.SS blur-background
+.PP
+Toggle background blurring for windows under that type. ( true / false )
+
+.PP
+Setting this to false will not actually do anything since blurring is done on a whitelist basis.
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  desktop = { blur-background = true; };
+}
+
+.fi
+.RE
+
+.SS full-shadow
+.PP
+Toggle full shadow. ( true / false )
+
+.PP
+Not sure what full shadow is at the moment.
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  dropdown_menu = { full-shadow = false; };
+}
+
+.fi
+.RE
+
+.SS redir-ignore
+.PP
+Toggle redirect ignoring. ( true / false )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  dock = { redir-ignore = true; };
+}
+
+.fi
+.RE
+
+.SS clip-shadow-above
+.PP
+Toggle clipping shadows above a window. ( true / false )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  utility = { clip-shadow-above = true; };
+}
+
+.fi
+.RE
+
+.SS opacity
+.PP
+Set the opacity, both inactive and active. ( 0.0 ~ 1.0 )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  popup_menu = { opacity = 0.5; };
+}
+
+.fi
+.RE
+
+.SS animation
+.PP
+Set the open animation for specific wintypes. ( See \fB\fCanimation-for-open-window\fR under the Animations page for available options )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  popup_menu = { animation = "slide-right"; };
+}
+
+.fi
+.RE
+
+.SS animation-unmap
+.PP
+Set the close animation for specific wintypes. ( See \fB\fCanimation-for-unmap-window\fR under the Animations page for available options )
+
+.PP
+.RS
+
+.nf
+wintypes:
+{
+  tooltip = { animation-unmap = "fly-in"; };
+}
+
+.fi
+.RE

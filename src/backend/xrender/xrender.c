@@ -17,7 +17,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "log.h"
-#include "picom.h"
+#include "compfy.h"
 #include "region.h"
 #include "types.h"
 #include "utils.h"

@@ -591,7 +591,7 @@ static char *locate_auxiliary_file_at(const char *base, const char *scope, const
  *   1) If an absolute path is given, use it directly.
  *   2) Search for the file directly under `include_dir`.
  *   3) Search for the file in the XDG configuration directories, under path
- *      /picom/<scope>/
+ *      /compfy/<scope>/
  */
 char *locate_auxiliary_file(const char *scope, const char *path, const char *include_dir) {
 	if (!path || strlen(path) == 0) {
@@ -615,9 +615,9 @@ char *locate_auxiliary_file(const char *scope, const char *path, const char *inc
 	}
 
 	// Fall back to searching in user config directory
-	scoped_charp picom_scope = mstrjoin("/picom/", scope);
+	scoped_charp compfy_scope = mstrjoin("/compfy/", scope);
 	scoped_charp config_home = (char *)xdg_config_home();
-	char *ret = locate_auxiliary_file_at(config_home, picom_scope, path);
+	char *ret = locate_auxiliary_file_at(config_home, compfy_scope, path);
 	if (ret) {
 		return ret;
 	}
@@ -625,7 +625,7 @@ char *locate_auxiliary_file(const char *scope, const char *path, const char *inc
 	// Fall back to searching in system config directory
 	auto config_dirs = xdg_config_dirs();
 	for (int i = 0; config_dirs[i]; i++) {
-		ret = locate_auxiliary_file_at(config_dirs[i], picom_scope, path);
+		ret = locate_auxiliary_file_at(config_dirs[i], compfy_scope, path);
 		if (ret) {
 			free(config_dirs);
 			return ret;
@@ -841,7 +841,7 @@ char *parse_config(options_t *opt, const char *config_file, bool *shadow_enable,
 	    .no_fading_destroyed_argb = false,
 	    .fade_blacklist = NULL,
 
-		// Picom Allusive
+		// compfy Allusive
 
 	    .animations = true,
 	    .animation_for_open_window = OPEN_WINDOW_ANIMATION_ZOOM,

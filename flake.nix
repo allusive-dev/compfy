@@ -13,23 +13,26 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        nativeBuildInputs = with pkgs; [];
-        buildInputs = with pkgs; [pcre2];
+        nativeBuildInputs = with pkgs; [ go-md2man ];
+        buildInputs = with pkgs; [ pcre2 ];
       in {
         devShells.default = pkgs.mkShell {inherit nativeBuildInputs buildInputs;};
 
         packages = rec {
-          default = picom-allusive;
-          picom-allusive = pkgs.picom.overrideAttrs (_old: {
+          default = compfy;
+          compfy = pkgs.picom.overrideAttrs (_old: {
             src = ./.;
+            name = "compfy";
             buildInputs = buildInputs ++ _old.buildInputs;
             nativeBuildInputs = nativeBuildInputs ++ _old.nativeBuildInputs;
+            postInstall = '''';
+            mainProgram = "compfy";
           });
         };
 
         overlays = rec {
-          default = picom-allusive;
-          picom-allusive = self.packages.default;
+          default = compfy;
+          compfy = self.packages.default;
         };
       }
     );

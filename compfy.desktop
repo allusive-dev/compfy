@@ -2,13 +2,13 @@
 Version=1.0
 Type=Application
 NoDisplay=false
-Name=picom
+Name=compfy
 GenericName=X compositor
 Comment=An X compositor
 Categories=Utility;
 Keywords=compositor;composite manager;window effects;transparency;opacity;
-TryExec=picom
-Exec=picom
+TryExec=compfy
+Exec=compfy
 StartupNotify=false
 Terminal=false
 # Thanks to quequotion for providing this file!

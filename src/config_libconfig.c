@@ -40,8 +40,8 @@ static inline int lcfg_lookup_bool(const config_t *config, const char *path, boo
 
 /// Search for config file under a base directory
 FILE *open_config_file_at(const char *base, char **out_path) {
-	static const char *config_paths[] = {"/picom.conf", "/picom/picom.conf",
-	                                     "/compton.conf", "/compton/compton.conf"};
+	static const char *config_paths[] = {"/compfy.conf", "/compfy/compfy.conf",
+	                                     "/picom.conf", "/picom/picom.conf"};
 	for (size_t i = 0; i < ARR_SIZE(config_paths); i++) {
 		char *path = mstrjoin(base, config_paths[i]);
 		FILE *ret = fopen(path, "r");
@@ -51,11 +51,11 @@ FILE *open_config_file_at(const char *base, char **out_path) {
 			free(path);
 		}
 		if (ret) {
-			if (strstr(config_paths[i], "compton")) {
-				log_warn("This compositor has been renamed to \"picom\", "
+			if (strstr(config_paths[i], "picom")) {
+				log_warn("This compositor has been renamed to \"compfy\", "
 				         "the old config file paths is deprecated. "
-				         "Please replace the \"compton\"s in the path "
-				         "with \"picom\"");
+				         "Please replace the \"picom\"s in the path "
+				         "with \"compfy\"");
 			}
 			return ret;
 		}
@@ -69,7 +69,7 @@ FILE *open_config_file_at(const char *base, char **out_path) {
  * Follows the XDG specification to search for the configuration file.
  */
 FILE *open_config_file(const char *cpath, char **ppath) {
-	static const char config_filename_legacy[] = "/.compton.conf";
+	static const char config_filename_legacy[] = "/.picom.conf";
 
 	if (cpath) {
 		FILE *ret = fopen(cpath, "r");

@@ -1,13 +1,4 @@
 // SPDX-License-Identifier: MIT
-/*
- * Compton - a compositor for X11
- *
- * Based on `xcompmgr` - Copyright (c) 2003, Keith Packard
- *
- * Copyright (c) 2011-2013, Christopher Jeffrey
- * See LICENSE-mit for more information.
- *
- */
 
 #include <X11/Xlib.h>
 #include <ctype.h>
@@ -72,8 +63,8 @@ typedef uint32_t cdbus_enum_t;
 	cdbus_reply_errm((ps), dbus_message_new_error_printf(                            \
 	                           (srcmsg), (err_name), (err_format), ##__VA_ARGS__))
 
-#define PICOM_WINDOW_INTERFACE "picom.Window"
-#define PICOM_COMPOSITOR_INTERFACE "picom.Compositor"
+#define COMPFY_WINDOW_INTERFACE "compfy.Window"
+#define COMPFY_COMPOSITOR_INTERFACE "compfy.Compositor"
 
 static DBusHandlerResult cdbus_process(DBusConnection *conn, DBusMessage *m, void *);
 static DBusHandlerResult cdbus_process_windows(DBusConnection *c, DBusMessage *msg, void *ud);
@@ -848,7 +839,7 @@ cdbus_process_window_property_get(session_t *ps, DBusMessage *msg, cdbus_window_
 		return false;
 	}
 
-	if (strcmp(interface, PICOM_WINDOW_INTERFACE)) {
+	if (strcmp(interface, COMPFY_WINDOW_INTERFACE)) {
 		return false;
 	}
 
@@ -1153,7 +1144,7 @@ static bool cdbus_process_opts_get(session_t *ps, DBusMessage *msg) {
 
 	// version
 	if (!strcmp("version", target)) {
-		cdbus_reply_string(ps, msg, PICOM_VERSION);
+		cdbus_reply_string(ps, msg, COMPFY_VERSION);
 		return true;
 	}
 
@@ -1388,7 +1379,7 @@ static bool cdbus_process_introspect(session_t *ps, DBusMessage *msg) {
 	    "    <method name='reset' />\n"
 	    "    <method name='repaint' />\n"
 	    "  </interface>\n"
-	    "  <interface name='" PICOM_COMPOSITOR_INTERFACE "'>\n"
+	    "  <interface name='" COMPFY_COMPOSITOR_INTERFACE "'>\n"
 	    "    <signal name='WinAdded'>\n"
 	    "      <arg name='wid' type='" CDBUS_TYPE_WINDOW_STR "'/>\n"
 	    "    </signal>\n"
@@ -1479,7 +1470,7 @@ static bool cdbus_process_window_introspect(session_t *ps, DBusMessage *msg) {
 	    "      <arg type='as' name='invalidated_properties'/>\n"
 	    "    </signal>\n"
 	    "  </interface>\n"
-	    "  <interface name='" PICOM_WINDOW_INTERFACE "'>\n"
+	    "  <interface name='" COMPFY_WINDOW_INTERFACE "'>\n"
 	    "    <property type='" CDBUS_TYPE_WINDOW_STR "' name='Leader' access='read'/>\n"
 	    "    <property type='" CDBUS_TYPE_WINDOW_STR "' name='ClientWin' access='read'/>\n"
 	    "    <property type='" CDBUS_TYPE_WINDOW_STR "' name='Id' access='read'/>\n"
@@ -1507,7 +1498,7 @@ cdbus_process(DBusConnection *c attr_unused, DBusMessage *msg, void *ud) {
 	dbus_message_is_method_call(msg, CDBUS_INTERFACE_NAME, method)
 
 	if (cdbus_m_ismethod("reset")) {
-		log_info("picom is resetting...");
+		log_info("Compfy is resetting...");
 		ev_break(ps->loop, EVBREAK_ALL);
 		if (!dbus_message_get_no_reply(msg))
 			cdbus_reply_bool(ps, msg, true);
@@ -1656,7 +1647,7 @@ void cdbus_ev_win_added(session_t *ps, struct win *w) {
 	struct cdbus_data *cd = ps->dbus_data;
 	if (cd->dbus_conn) {
 		cdbus_signal_wid(ps, CDBUS_INTERFACE_NAME, "win_added", w->id);
-		cdbus_signal_wid(ps, PICOM_COMPOSITOR_INTERFACE, "WinAdded", w->id);
+		cdbus_signal_wid(ps, COMPFY_COMPOSITOR_INTERFACE, "WinAdded", w->id);
 	}
 }
 
@@ -1664,7 +1655,7 @@ void cdbus_ev_win_destroyed(session_t *ps, struct win *w) {
 	struct cdbus_data *cd = ps->dbus_data;
 	if (cd->dbus_conn) {
 		cdbus_signal_wid(ps, CDBUS_INTERFACE_NAME, "win_destroyed", w->id);
-		cdbus_signal_wid(ps, PICOM_COMPOSITOR_INTERFACE, "WinDestroyed", w->id);
+		cdbus_signal_wid(ps, COMPFY_COMPOSITOR_INTERFACE, "WinDestroyed", w->id);
 	}
 }
 
@@ -1672,7 +1663,7 @@ void cdbus_ev_win_mapped(session_t *ps, struct win *w) {
 	struct cdbus_data *cd = ps->dbus_data;
 	if (cd->dbus_conn) {
 		cdbus_signal_wid(ps, CDBUS_INTERFACE_NAME, "win_mapped", w->id);
-		cdbus_signal_wid(ps, PICOM_COMPOSITOR_INTERFACE, "WinMapped", w->id);
+		cdbus_signal_wid(ps, COMPFY_COMPOSITOR_INTERFACE, "WinMapped", w->id);
 	}
 }
 
@@ -1680,7 +1671,7 @@ void cdbus_ev_win_unmapped(session_t *ps, struct win *w) {
 	struct cdbus_data *cd = ps->dbus_data;
 	if (cd->dbus_conn) {
 		cdbus_signal_wid(ps, CDBUS_INTERFACE_NAME, "win_unmapped", w->id);
-		cdbus_signal_wid(ps, PICOM_COMPOSITOR_INTERFACE, "WinUnmapped", w->id);
+		cdbus_signal_wid(ps, COMPFY_COMPOSITOR_INTERFACE, "WinUnmapped", w->id);
 	}
 }
 

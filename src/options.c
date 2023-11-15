@@ -22,7 +22,7 @@
 
 #pragma GCC diagnostic error "-Wunused-parameter"
 
-struct picom_option {
+struct compfy_option {
 	const char *long_name;
 	int has_arg;
 	int val;
@@ -32,7 +32,7 @@ struct picom_option {
 
 // clang-format off
 static const struct option *longopts = NULL;
-static const struct picom_option picom_options[] = {
+static const struct compfy_option compfy_options[] = {
 #ifdef CONFIG_LIBCONFIG
     {"config"                      , required_argument, 256, NULL          , "Path to the configuration file."},
 #endif
@@ -172,7 +172,7 @@ static const struct picom_option picom_options[] = {
     {"monitor-repaint"             , no_argument      , 800, NULL          , "Highlight the updated area of the screen. For debugging."},
     {"diagnostics"                 , no_argument      , 801, NULL          , "Print diagnostic information"},
     {"debug-mode"                  , no_argument      , 802, NULL          , "Render into a separate window, and don't take over the screen. Useful when "
-                                                                             "you want to attach a debugger to picom"},
+                                                                             "you want to attach a debugger to compfy"},
     {"no-ewmh-fullscreen"          , no_argument      , 803, NULL          , "Do not use EWMH to detect fullscreen windows. Reverts to checking if a "
                                                                              "window is fullscreen based only on its size and coordinates."},
     {"animations", no_argument, 804, NULL, "Toggles Animations"},
@@ -195,12 +195,12 @@ static const struct picom_option picom_options[] = {
 // clang-format on
 
 static void setup_longopts(void) {
-	auto opts = ccalloc(ARR_SIZE(picom_options) + 1, struct option);
-	for (size_t i = 0; i < ARR_SIZE(picom_options); i++) {
-		opts[i].name = picom_options[i].long_name;
-		opts[i].has_arg = picom_options[i].has_arg;
+	auto opts = ccalloc(ARR_SIZE(compfy_options) + 1, struct option);
+	for (size_t i = 0; i < ARR_SIZE(compfy_options); i++) {
+		opts[i].name = compfy_options[i].long_name;
+		opts[i].has_arg = compfy_options[i].has_arg;
 		opts[i].flag = NULL;
-		opts[i].val = picom_options[i].val;
+		opts[i].val = compfy_options[i].val;
 	}
 	longopts = opts;
 }
@@ -259,9 +259,9 @@ void print_help(const char *help, size_t indent, size_t curr_indent, size_t line
  */
 static void usage(const char *argv0, int ret) {
 	FILE *f = (ret ? stderr : stdout);
-	fprintf(f, "picom (%s)\n", PICOM_VERSION);
+	fprintf(f, "compfy (%s)\n", COMPFY_VERSION);
 	fprintf(f, "Standalone X11 compositor\n");
-	fprintf(f, "Please report bugs to https://github.com/yshui/picom\n\n");
+	fprintf(f, "Please report bugs to https://github.com/allusive-dev/compfy\n\n");
 
 	fprintf(f, "Usage: %s [OPTION]...\n\n", argv0);
 	fprintf(f, "OPTIONS:\n");
@@ -273,14 +273,14 @@ static void usage(const char *argv0, int ret) {
 	}
 
 	size_t help_indent = 0;
-	for (size_t i = 0; i < ARR_SIZE(picom_options); i++) {
-		if (picom_options[i].help == NULL) {
+	for (size_t i = 0; i < ARR_SIZE(compfy_options); i++) {
+		if (compfy_options[i].help == NULL) {
 			// Hide options with no help message.
 			continue;
 		}
-		auto option_len = strlen(picom_options[i].long_name) + 2 + 4;
-		if (picom_options[i].arg_name) {
-			option_len += strlen(picom_options[i].arg_name) + 1;
+		auto option_len = strlen(compfy_options[i].long_name) + 2 + 4;
+		if (compfy_options[i].arg_name) {
+			option_len += strlen(compfy_options[i].arg_name) + 1;
 		}
 		if (option_len > help_indent && option_len < 30) {
 			help_indent = option_len;
@@ -288,27 +288,27 @@ static void usage(const char *argv0, int ret) {
 	}
 	help_indent += 6;
 
-	for (size_t i = 0; i < ARR_SIZE(picom_options); i++) {
-		if (picom_options[i].help == NULL) {
+	for (size_t i = 0; i < ARR_SIZE(compfy_options); i++) {
+		if (compfy_options[i].help == NULL) {
 			continue;
 		}
 		size_t option_len = 8;
 		fprintf(f, "    ");
-		if ((picom_options[i].val > 'a' && picom_options[i].val < 'z') ||
-		    (picom_options[i].val > 'A' && picom_options[i].val < 'Z')) {
-			fprintf(f, "-%c, ", picom_options[i].val);
+		if ((compfy_options[i].val > 'a' && compfy_options[i].val < 'z') ||
+		    (compfy_options[i].val > 'A' && compfy_options[i].val < 'Z')) {
+			fprintf(f, "-%c, ", compfy_options[i].val);
 		} else {
 			fprintf(f, "    ");
 		}
-		fprintf(f, "--%s", picom_options[i].long_name);
-		option_len += strlen(picom_options[i].long_name) + 2;
-		if (picom_options[i].arg_name) {
-			fprintf(f, "=%s", picom_options[i].arg_name);
-			option_len += strlen(picom_options[i].arg_name) + 1;
+		fprintf(f, "--%s", compfy_options[i].long_name);
+		option_len += strlen(compfy_options[i].long_name) + 2;
+		if (compfy_options[i].arg_name) {
+			fprintf(f, "=%s", compfy_options[i].arg_name);
+			option_len += strlen(compfy_options[i].arg_name) + 1;
 		}
 		fprintf(f, "  ");
 		option_len += 2;
-		print_help(picom_options[i].help, help_indent, option_len,
+		print_help(compfy_options[i].help, help_indent, option_len,
 		           (size_t)line_wrap, f);
 	}
 }
@@ -342,7 +342,7 @@ bool get_early_config(int argc, char *const *argv, char **config_file, bool *all
 		} else if (o == 314) {
 			*all_xerrors = true;
 		} else if (o == 318) {
-			printf("%s\n", PICOM_VERSION);
+			printf("%s\n", COMPFY_VERSION);
 			return true;
 		} else if (o == '?' || o == ':') {
 			usage(argv[0], 1);
@@ -353,7 +353,7 @@ bool get_early_config(int argc, char *const *argv, char **config_file, bool *all
 	// Check for abundant positional arguments
 	if (optind < argc) {
 		// log is not initialized here yet
-		fprintf(stderr, "picom doesn't accept positional arguments.\n");
+		fprintf(stderr, "Compfy doesn't accept positional arguments.\n");
 		goto err;
 	}
 

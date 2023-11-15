@@ -25,7 +25,7 @@
 #include "config.h"
 #include "list.h"
 #include "log.h"
-#include "picom.h"
+#include "compfy.h"
 #include "region.h"
 #include "render.h"
 #include "string_utils.h"
@@ -3133,7 +3133,7 @@ struct managed_win *find_managed_window_or_parent(session_t *ps, xcb_window_t wi
 	// Using find_win here because if we found a unmanaged window we know
 	// about, we can stop early.
 	while (wid && wid != ps->root && !(w = find_win(ps, wid))) {
-		// xcb_query_tree probably fails if you run picom when X is
+		// xcb_query_tree probably fails if you run compfy when X is
 		// somehow initializing (like add it in .xinitrc). In this case
 		// just leave it alone.
 		auto reply = xcb_query_tree_reply(ps->c, xcb_query_tree(ps->c, wid), NULL);

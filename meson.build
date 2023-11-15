@@ -1,21 +1,12 @@
-project('picom', 'c', version: '1.5.0',
+project('compfy', 'c', version: '1.6.0',
         default_options: ['c_std=c11', 'warning_level=1'])
 
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v1.5.0'
+version = 'v'+meson.project_version()
 
-# use git describe if that's available
-# git = find_program('git', required: false)
-# if git.found()
-# 	gitv = run_command('git', 'rev-parse', '--short=5', 'HEAD', check: false)
-# 	if gitv.returncode() == 0
-# 		version = version
-# 	endif
-# endif
-
-add_global_arguments('-DPICOM_VERSION="'+version+'"', language: 'c')
+add_global_arguments('-DCOMPFY_VERSION="'+version+'"', language: 'c')
 
 if get_option('buildtype') == 'release'
 	add_global_arguments('-DNDEBUG', language: 'c')
@@ -43,7 +34,7 @@ if get_option('modularize')
 	add_global_arguments(['-fmodules',
 	                      '-fmodule-map-file='+
 	                      meson.current_source_dir()+
-	                      '/src/picom.modulemap'],
+	                      '/src/compfy.modulemap'],
 	                     language: 'c')
 endif
 
@@ -66,10 +57,13 @@ if get_option('warning_level') != '0'
   endforeach
 endif
 
+if get_option('with_docs')
+	install_data('./man/compfy.1', install_dir: join_paths(get_option('mandir'), 'man1'))
+endif
+
 test_h_dep = subproject('test.h').get_variable('test_h_dep')
 
 subdir('src')
 
-install_data('bin/picom-trans', install_dir: get_option('bindir'))
-install_data('picom.desktop', install_dir: 'share/applications')
-install_data('picom.desktop', install_dir: get_option('sysconfdir') / 'xdg' / 'autostart')
+install_data('compfy.desktop', install_dir: 'share/applications')
+install_data('compfy.desktop', install_dir: get_option('sysconfdir') / 'xdg' / 'autostart')

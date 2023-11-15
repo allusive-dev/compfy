@@ -14,7 +14,7 @@
 #include "config.h"
 #include "event.h"
 #include "log.h"
-#include "picom.h"
+#include "compfy.h"
 #include "region.h"
 #include "utils.h"
 #include "win.h"

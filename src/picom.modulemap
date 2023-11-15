@@ -20,8 +20,8 @@ module utils {
 module region {
   header "region.h"
 }
-module picom {
-  header "picom.h"
+module compfy {
+  header "compfy.h"
 }
 module types {
   header "types.h"

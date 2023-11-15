@@ -32,7 +32,6 @@ enum root_flags {
 };
 
 // == Functions ==
-// TODO(yshui) move static inline functions that are only used in picom.c, into picom.c
 
 void add_damage(session_t *ps, const region_t *damage);
 

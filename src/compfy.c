@@ -1,13 +1,4 @@
 // SPDX-License-Identifier: MIT
-/*
- * Compton - a compositor for X11
- *
- * Based on `xcompmgr` - Copyright (c) 2003, Keith Packard
- *
- * Copyright (c) 2011-2013, Christopher Jeffrey
- * See LICENSE-mit for more information.
- *
- */
 
 #include <X11/Xlib-xcb.h>
 #include <X11/Xlib.h>
@@ -37,7 +28,7 @@
 #include "config.h"
 #include "err.h"
 #include "kernel.h"
-#include "picom.h"
+#include "compfy.h"
 #ifdef CONFIG_OPENGL
 #include "opengl.h"
 #endif
@@ -1248,7 +1239,7 @@ static int register_cm(session_t *ps) {
 		    ps->c, xcb_change_property_checked(
 		               ps->c, XCB_PROP_MODE_REPLACE, ps->reg_win, prop_atoms[i],
 		               prop_is_utf8[i] ? ps->atoms->aUTF8_STRING : XCB_ATOM_STRING,
-		               8, strlen("picom"), "picom"));
+		               8, strlen("compfy"), "compfy"));
 		if (e) {
 			log_error_x_error(e, "Failed to set window property %d",
 			                  prop_atoms[i]);
@@ -1256,11 +1247,11 @@ static int register_cm(session_t *ps) {
 		}
 	}
 
-	const char picom_class[] = "picom\0picom";
+	const char compfy_class[] = "compfy\0compfy";
 	e = xcb_request_check(
 	    ps->c, xcb_change_property_checked(ps->c, XCB_PROP_MODE_REPLACE, ps->reg_win,
 	                                       ps->atoms->aWM_CLASS, XCB_ATOM_STRING, 8,
-	                                       ARR_SIZE(picom_class), picom_class));
+	                                       ARR_SIZE(compfy_class), compfy_class));
 	if (e) {
 		log_error_x_error(e, "Failed to set the WM_CLASS property");
 		free(e);
@@ -1302,7 +1293,7 @@ static int register_cm(session_t *ps) {
 	    ps->c, xcb_change_property_checked(
 	               ps->c, XCB_PROP_MODE_REPLACE, ps->reg_win,
 	               get_atom(ps->atoms, "COMPTON_VERSION"), XCB_ATOM_STRING, 8,
-	               (uint32_t)strlen(PICOM_VERSION), PICOM_VERSION));
+	               (uint32_t)strlen(COMPFY_VERSION), COMPFY_VERSION));
 	if (e) {
 		log_error_x_error(e, "Failed to set COMPTON_VERSION.");
 		free(e);
@@ -1798,13 +1789,13 @@ static void x_event_callback(EV_P attr_unused, ev_io *w, int revents attr_unused
  * This will result in the compostior resetting itself after next paint.
  */
 static void reset_enable(EV_P_ ev_signal *w attr_unused, int revents attr_unused) {
-	log_info("picom is resetting...");
+	log_info("Compfy is resetting...");
 	ev_break(EV_A_ EVBREAK_ALL);
 }
 
 static void exit_enable(EV_P attr_unused, ev_signal *w, int revents attr_unused) {
 	session_t *ps = session_ptr(w, int_signal);
-	log_info("picom is quitting...");
+	log_info("Compfy is quitting...");
 	quit(ps);
 }
 
@@ -2118,7 +2109,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	}
 
 	if (strstr(argv[0], "compton")) {
-		log_warn("This compositor has been renamed to \"picom\", the \"compton\" "
+		log_warn("This compositor has been renamed to \"compfy\", the \"picom\" "
 		         "binary will not be installed in the future.");
 	}
 
