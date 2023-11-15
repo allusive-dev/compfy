@@ -1,5 +1,5 @@
 # Compfy
-See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
+See [What is This](https://github.com/allusive-dev/compfy#what-is-this)
 
 <br>
 <br>
