@@ -216,13 +216,14 @@ static inline const char *gl_get_err_str(GLenum err) {
  *
  * http://blog.nobel-joergensen.com/2013/01/29/debugging-opengl-using-glgeterror/
  */
-static inline void gl_check_err_(const char *func, int line) {
-	GLenum err = GL_NO_ERROR;
 
-	while (GL_NO_ERROR != (err = glGetError())) {
-		const char *errtext = gl_get_err_str(err);
+// Hide GL Errors Temporarily. -Allusive
 
-		// Hide GL Errors Temporarily. -Allusive
+// static inline void gl_check_err_(const char *func, int line) {
+// 	GLenum err = GL_NO_ERROR;
+
+// 	while (GL_NO_ERROR != (err = glGetError())) {
+// 		const char *errtext = gl_get_err_str(err);
 
 		// if (errtext) {
 		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
@@ -231,15 +232,15 @@ static inline void gl_check_err_(const char *func, int line) {
 		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
 		// 	           "GLX error at line %d: %d", line, err);
 		// }
-	}
-}
+// 	}
+// }
 
-static inline void gl_clear_err(void) {
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
+// static inline void gl_clear_err(void) {
+// 	while (glGetError() != GL_NO_ERROR)
+// 		;
+// }
 
-#define gl_check_err() gl_check_err_(__func__, __LINE__)
+// #define gl_check_err() gl_check_err_(__func__, __LINE__)
 
 /**
  * Check for GL framebuffer completeness.
@@ -280,7 +281,7 @@ static inline bool gl_has_extension(const char *ext) {
 			return true;
 		}
 	}
-	gl_clear_err();
+	// gl_clear_err();
 	// log_info("Missing GL extension %s.", ext);
 	return false;
 }
