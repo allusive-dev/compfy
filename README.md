@@ -3,6 +3,7 @@ See [What is This](https://github.com/allusive-dev/compfy#what-is-this)
 
 <br>
 <br>
+
 # Update
 
 Now that Compfy has publically released I want to make a few things clear.
