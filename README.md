@@ -12,6 +12,8 @@ See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 
 [Thread - Issue 34](https://github.com/allusive-dev/picom-allusive/issues/34)
 
+**There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy:matrix.org)**
+
 <br>
 <br>
 <br>
