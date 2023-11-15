@@ -6,7 +6,10 @@
 
   outputs = {
     self,
+    lib,
+    xwininfo,
     nixpkgs,
+    withDebug ? false,
     flake-utils,
     ...
   }:
@@ -18,12 +21,20 @@
       in {
         devShells.default = pkgs.mkShell {inherit nativeBuildInputs buildInputs;};
 
+        dontStrip = withDebug;
+
         packages = rec {
           default = compfy;
           compfy = pkgs.picom.overrideAttrs (_old: {
             src = ./.;
             buildInputs = buildInputs ++ _old.buildInputs;
             nativeBuildInputs = nativeBuildInputs ++ _old.nativeBuildInputs;
+            postInstall = ''
+              wrapProgram $out/bin/compfy-trans \
+                --prefix PATH : ${lib.makeBinPath [ xwininfo ]}
+            '' + lib.optionalString withDebug ''
+              cp -r ../src $out/
+            '';
           });
         };
 

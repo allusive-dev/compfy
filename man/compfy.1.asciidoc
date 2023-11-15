@@ -15,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-compfy is a compositor based on Dana Jansens' version of xcompmgr (which itself was written by Keith Packard). It includes some improvements over the original xcompmgr, like window frame opacity and inactive window transparency.
+compfy is a compositor based on Picom based on Compton a fork of xcompmgr (which itself was written by Keith Packard). It includes improvements over Picom, like Animations and more rule sets.
 
 OPTIONS
 -------

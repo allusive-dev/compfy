@@ -1,10 +1,10 @@
-project('compfy', 'c', version: '1.5.0',
+project('compfy', 'c', version: '1.6.0',
         default_options: ['c_std=c11', 'warning_level=1'])
 
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v1.5.0'
+version = 'v1.6.0'
 
 # use git describe if that's available
 # git = find_program('git', required: false)
@@ -69,6 +69,7 @@ endif
 test_h_dep = subproject('test.h').get_variable('test_h_dep')
 
 subdir('src')
+subdir('man')
 
 install_data('bin/compfy-trans', install_dir: get_option('bindir'))
 install_data('compfy.desktop', install_dir: 'share/applications')
