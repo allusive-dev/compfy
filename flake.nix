@@ -13,7 +13,7 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        nativeBuildInputs = with pkgs; [ go-md2man ];
+        nativeBuildInputs = with pkgs; [];
         buildInputs = with pkgs; [ pcre2 ];
       in {
         devShells.default = pkgs.mkShell {inherit nativeBuildInputs buildInputs;};
