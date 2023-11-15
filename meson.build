@@ -4,7 +4,7 @@ project('compfy', 'c', version: '1.6.0',
 cc = meson.get_compiler('c')
 
 # use project version by default
-version = 'v1.6.0'
+version = 'v'+meson.project_version()
 
 # use git describe if that's available
 # git = find_program('git', required: false)
