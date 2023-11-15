@@ -1,24 +1,47 @@
 {
-  description = "My Nix packages";
-
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    snowfall-lib = {
-      url = "github:snowfallorg/lib";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = inputs:
-    inputs.snowfall-lib.mkFlake {
-      inherit inputs;
+  outputs = {
+    self,
+    lib,
+    xwininfo,
+    nixpkgs,
+    withDebug ? false,
+    flake-utils,
+    ...
+  }:
+    flake-utils.lib.eachDefaultSystem (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nativeBuildInputs = with pkgs; [];
+        buildInputs = with pkgs; [pcre2];
+      in {
+        devShells.default = pkgs.mkShell {inherit nativeBuildInputs buildInputs;};
 
-      src = ./.;
+        dontStrip = withDebug;
 
-      snowfall = {
-          root = ./nix;
-      };
-    };
+        packages = rec {
+          default = compfy;
+          compfy = pkgs.picom.overrideAttrs (_old: {
+            src = ./.;
+            buildInputs = buildInputs ++ _old.buildInputs;
+            nativeBuildInputs = nativeBuildInputs ++ _old.nativeBuildInputs;
+            postInstall = ''
+              wrapProgram $out/bin/compfy-trans \
+                --prefix PATH : ${lib.makeBinPath [ xwininfo ]}
+            '' + lib.optionalString withDebug ''
+              cp -r ../src $out/
+            '';
+          });
+        };
+
+        overlays = rec {
+          default = compfy;
+          compfy = self.packages.default;
+        };
+      }
+    );
 }
