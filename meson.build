@@ -69,3 +69,5 @@ subdir('src')
 
 install_data('compfy.desktop', install_dir: 'share/applications')
 install_data('compfy.desktop', install_dir: get_option('sysconfdir') / 'xdg' / 'autostart')
+install_data('media/compfy.svg', install_dir: 'share/icons/hicolor/scalable/apps')
+install_data('media/icons/compfy.png', install_dir: 'share/icons/hicolor/48x48/apps')

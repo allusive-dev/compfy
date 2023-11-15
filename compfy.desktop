@@ -2,7 +2,7 @@
 Version=1.0
 Type=Application
 NoDisplay=false
-Name=compfy
+Name=Compfy
 GenericName=X compositor
 Comment=An X compositor
 Categories=Utility;
