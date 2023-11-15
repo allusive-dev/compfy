@@ -8,9 +8,11 @@ version = 'v'+meson.project_version()
 
 add_global_arguments('-DCOMPFY_VERSION="'+version+'"', language: 'c')
 
-if get_option('buildtype') == 'release'
-	add_global_arguments('-DNDEBUG', language: 'c')
-endif
+add_global_arguments('-DNDEBUG', language: 'c')
+
+# if get_option('buildtype') == 'release'
+# 	add_global_arguments('-DNDEBUG', language: 'c')
+# endif
 
 if get_option('sanitize')
 	sanitizers = ['address', 'undefined']
