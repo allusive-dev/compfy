@@ -60,7 +60,7 @@ This is currently the best actively maintained alternative to Picom adding prope
 
 ## Documentation/Wiki.
 
-The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/picom-allusive/-/documents/) an up and coming git versioned database allows for more than just code to be versioned.
+The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/compfy/-/documents/) an up and coming git versioned database allows for more than just code to be versioned.
 
 The GitHub Wiki is still actively maintained just incase, so don't worry about relying 100% on a external site yet if you don't feel comfortable with that. Thought I highly encourage taking a good look at Donument.
 
