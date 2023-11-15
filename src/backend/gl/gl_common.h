@@ -281,7 +281,7 @@ static inline bool gl_has_extension(const char *ext) {
 		}
 	}
 	gl_clear_err();
-	log_info("Missing GL extension %s.", ext);
+	// log_info("Missing GL extension %s.", ext);
 	return false;
 }
 

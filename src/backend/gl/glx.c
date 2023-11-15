@@ -568,11 +568,11 @@ static inline bool glx_has_extension(Display *dpy, int screen, const char *ext) 
 		curr = end ? end + 1 : NULL;
 	}
 
-	if (!match) {
-		log_info("Missing GLX extension %s.", ext);
-	} else {
-		log_info("Found GLX extension %s.", ext);
-	}
+	// if (!match) {
+	// 	log_info("Missing GLX extension %s.", ext);
+	// } else {
+	// 	log_info("Found GLX extension %s.", ext);
+	// }
 
 	return match;
 }
