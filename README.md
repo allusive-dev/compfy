@@ -70,7 +70,7 @@ Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ### Building Manually
 ```
-$ meson setup --buildtype=release . build
+$ meson setup . build
 $ ninja -C build
 $ ninja -C build install
 ```
