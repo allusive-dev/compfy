@@ -6,6 +6,11 @@ See [What is This](https://github.com/allusive-dev/compfy#what-is-this)
 
 # Update
 
+Now that Compfy has publically released I want to make a few things clear.
+- Compfy will continue to recieve updates based on `yshui/picom`'s stable releases.
+- Compfy is no longer considered a fork of Picom, it is its own compositor based upon Picom.
+
+
 **There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy:matrix.org)**
 
 <br>
@@ -94,30 +99,17 @@ ninja (make)
 ### Arch Linux or other Arch based distros
 
 ```
-$ paru -S picom-allusive
+$ paru -S compfy
 ```
 or
 ```
-$ yay -S picom-allusive
+$ yay -S compfy
 ```
 
 ### NixOS
 
-picom-allusive is avaliable on unstable(23.11)
+Compfy is not yet avaliable on unstable(23.11)
 
-Keep in mind it can take up to a week after picom is updated before it will be avaliable on NixOS.
-
-Simply do one of the following
-``` nix
-environment.systemPackages = [ pkgs.picom-allusive ];
-```
-or for home-manager
-``` nix
-home.packages = [ pkgs.picom-allusive ];
-```
-
-The package will not be avaliable on NixOS 23.05 You will have to wait until the next stable update if you are on the stable branch.
-
-**If you still want to use picom and you are on 23.05 you can use the custom package (updated in the releases page) in either `environment.systemPackages` or `home.packages` for home-manager users. Keep in mind this is considerably unstable so expect possible issues.**
+Coming soon though.
 
 Thank you for your patience.
