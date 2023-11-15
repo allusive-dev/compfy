@@ -1,20 +1,13 @@
-# picom-allusive
+# Compfy
 See [What is This](https://github.com/allusive-dev/picom-allusive#what-is-this)
 
 <br>
 <br>
-<br>
-
 
 # Update
 
-**If you use this package whatsoever or are intersted in its development, want to support future development or anything, please join the thread below where big changes to this package going ahead are being decided!**
-
-[Thread - Issue 34](https://github.com/allusive-dev/picom-allusive/issues/34)
-
 **There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy:matrix.org)**
 
-<br>
 <br>
 <br>
 
@@ -54,9 +47,11 @@ Current Featueres:
 
 ## What Is This?
 
-This was originally a fork of pijulius and nothing more, but since `1.0` this project has become much more and I hope it will go even further with your help. 
+For those who don't know this is a compositor for Linux and the X11 platform. It gives windows transparency, blur, animations and much more!
 
-This is currently the best actively maintained fork of picom adding proper animations, implementing all features from upstream `v10.2` and adding more features as requested by the community!
+This was originally a fork of Picom and nothing more, as of `1.6.0` **Compfy** has become its own project entirely. Offering a alternative to Picom.
+
+This is currently the best actively maintained alternative to Picom adding proper animations, implementing all features from upstream `v10.2` and adding more features as requested by the community!
 
 ## Documentation/Wiki.
 
