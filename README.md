@@ -11,7 +11,7 @@ Now that Compfy has publically released I want to make a few things clear.
 - Compfy is no longer considered a fork of Picom, it is its own compositor based upon Picom.
 
 
-**There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy-general:matrix.org)**
+**There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy-discussion:matrix.org)**
 
 <br>
 <br>
