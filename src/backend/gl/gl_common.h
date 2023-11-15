@@ -195,7 +195,7 @@ static inline const char *gl_get_err_str(GLenum err) {
 		CASESTRRET(GL_INVALID_ENUM);
 		CASESTRRET(GL_INVALID_VALUE);
 		CASESTRRET(GL_INVALID_OPERATION);
-		CASESTRRET(GL_INVALID_FRAMEBUFFER_OPERATION);
+		// CASESTRRET(GL_INVALID_FRAMEBUFFER_OPERATION);
 		CASESTRRET(GL_OUT_OF_MEMORY);
 		CASESTRRET(GL_STACK_UNDERFLOW);
 		CASESTRRET(GL_STACK_OVERFLOW);
@@ -221,13 +221,16 @@ static inline void gl_check_err_(const char *func, int line) {
 
 	while (GL_NO_ERROR != (err = glGetError())) {
 		const char *errtext = gl_get_err_str(err);
-		if (errtext) {
-			log_printf(tls_logger, LOG_LEVEL_ERROR, func,
-			           "GLX error at line %d: %s", line, errtext);
-		} else {
-			log_printf(tls_logger, LOG_LEVEL_ERROR, func,
-			           "GLX error at line %d: %d", line, err);
-		}
+
+		// Hide GL Errors Temporarily. -Allusive
+
+		// if (errtext) {
+		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
+		// 	           "GLX error at line %d: %s", line, errtext);
+		// } else {
+		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
+		// 	           "GLX error at line %d: %d", line, err);
+		// }
 	}
 }
 
