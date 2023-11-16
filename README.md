@@ -31,6 +31,11 @@ Even if you can only give a small amount it goes a long way!**
 
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/allusive-dev)
 
+### Sponsors
+Thank you to the following people who make this work possible!
+
+[@SolninjaA](https://github.com/SolninjaA) ($5 One Time)
+
 ## Announcements
 
 Please check out the updated documentation.
