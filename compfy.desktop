@@ -11,5 +11,4 @@ TryExec=compfy
 Exec=compfy
 StartupNotify=false
 Terminal=false
-# Thanks to quequotion for providing this file!
-Icon=picom
+Icon=compfy
