@@ -221,20 +221,19 @@ static inline const char *gl_get_err_str(GLenum err) {
 
 // const char *func, int line
 
-static inline void gl_check_err_() {
+static inline void gl_check_err_(const char *func, int line) {
 	GLenum err = GL_NO_ERROR;
 
-	// while (GL_NO_ERROR != (err = glGetError())) {
-	// 	const char *errtext = gl_get_err_str(err);
-
-		// if (errtext) {
-		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
-		// 	           "GLX error at line %d: %s", line, errtext);
-		// } else {
-		// 	log_printf(tls_logger, LOG_LEVEL_ERROR, func,
-		// 	           "GLX error at line %d: %d", line, err);
-		// }
-	// }
+	while (GL_NO_ERROR != (err = glGetError())) {
+		const char *errtext = gl_get_err_str(err);
+		if (errtext) {
+			log_printf(tls_logger, LOG_LEVEL_ERROR, func,
+			           "GL error at line %d: %s", line, errtext);
+		} else if (err != 1286) {
+			log_printf(tls_logger, LOG_LEVEL_ERROR, func,
+			           "GL error at line %d: %d", line, err);
+		}
+	}
 }
 
 static inline void gl_clear_err(void) {
