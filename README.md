@@ -35,6 +35,7 @@ Even if you can only give a small amount it goes a long way!**
 Thank you to the following people who make this work possible!
 
 [@SolninjaA](https://github.com/SolninjaA) ($5 One Time) (And the first ever Sponsor!)
+[@maclightning2](https://github.com/maclightning2) ($3 A Month)
 
 ## Announcements
 
