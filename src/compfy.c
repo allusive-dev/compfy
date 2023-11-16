@@ -2110,7 +2110,7 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 
 	if (strstr(argv[0], "compton")) {
 		log_warn("This compositor has been renamed to \"compfy\", the \"picom\" "
-		         "binary will not be installed in the future.");
+		         "binary has not been installed.");
 	}
 
 	ps->atoms = init_atoms(ps->c);

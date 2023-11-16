@@ -55,7 +55,11 @@ FILE *open_config_file_at(const char *base, char **out_path) {
 				log_warn("This compositor has been renamed to \"compfy\", "
 				         "the old config file paths is deprecated. "
 				         "Please replace the \"picom\"s in the path "
-				         "with \"compfy\"");
+				         "with \"compfy\"\n");
+				log_warn("If you are coming from Picom please see "
+						 "the GitHub wiki or \"man compfy\" in "
+						 "relation to the new features and changes made "
+						 "BEFORE making an Issue on GitHub");
 			}
 			return ret;
 		}
