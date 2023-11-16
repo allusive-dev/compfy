@@ -59,9 +59,9 @@ Current Featueres:
 
 For those who don't know this is a compositor for Linux and the X11 platform. It gives windows transparency, blur, animations and much more!
 
-This was originally a fork of Picom and nothing more, as of `1.6.0` **Compfy** has become its own project entirely. Offering a alternative to Picom.
+Compfy provides all the features from `Picom` whilst implementing many more and also receiving frequent bugfixes as issues come up.
 
-This is currently the best actively maintained alternative to Picom adding proper animations, implementing all features from upstream `v10.2` and adding more features as requested by the community!
+This is currently the best actively maintained X11 Compositor adding proper animations and more features as requested by the community!
 
 ## Documentation/Wiki.
 
