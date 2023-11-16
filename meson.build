@@ -1,5 +1,5 @@
 project('compfy', 'c', version: '1.6.5',
-        default_options: ['c_std=c11', 'warning_level=1'])
+        default_options: ['c_std=c11', 'warning_level=1', 'buildtype=release'])
 
 cc = meson.get_compiler('c')
 
@@ -8,11 +8,9 @@ version = 'v'+meson.project_version()
 
 add_global_arguments('-DCOMPFY_VERSION="'+version+'"', language: 'c')
 
-add_global_arguments('-DNDEBUG', language: 'c')
-
-# if get_option('buildtype') == 'release'
-# 	add_global_arguments('-DNDEBUG', language: 'c')
-# endif
+if get_option('buildtype') == 'release'
+	add_global_arguments('-DNDEBUG', language: 'c')
+endif
 
 if get_option('sanitize')
 	sanitizers = ['address', 'undefined']
