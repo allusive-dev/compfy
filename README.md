@@ -74,9 +74,19 @@ Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## Installation
 
+Note if you want to enabled the `--check-for-update` option you will need to build with these commands instead.
+(`--check-for-update` will print out your current version and the latest release version number if you are connected to the internet)
+
 ### Building Manually
+Without `--check-for-update`:
 ```
 $ meson setup . build
+$ ninja -C build
+$ ninja -C build install
+```
+With `--check-for-update`:
+```
+$ meson setup -Dupdate_checks=true . build
 $ ninja -C build
 $ ninja -C build install
 ```
@@ -100,6 +110,11 @@ gcc (make)
 git (make)
 meson (make)
 ninja (make)
+
+# If you enabled -Dupdate-checks you will also need these dependencies.
+
+'json-c' or 'json_c'
+'curl' or 'libcurl'
 ```
 
 ### Arch Linux or other Arch based distros
