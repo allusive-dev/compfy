@@ -84,7 +84,7 @@ $ meson setup . build
 $ ninja -C build
 $ ninja -C build install
 ```
-With `--check-for-update`:
+With `--check-for-updates`:
 ```
 $ meson setup -Dupdate_checks=true . build
 $ ninja -C build
