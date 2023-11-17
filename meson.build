@@ -1,4 +1,4 @@
-project('compfy', 'c', version: '1.6.6',
+project('compfy', 'c', version: '1.7.0',
         default_options: ['c_std=c11', 'warning_level=1', 'buildtype=release'])
 
 cc = meson.get_compiler('c')
