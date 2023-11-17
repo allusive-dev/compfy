@@ -91,7 +91,7 @@ endif
 subdir('backend')
 
 compfy = executable('compfy', srcs, c_args: cflags,
-  dependencies: [ base_deps, deps, test_h_dep ],
+  dependencies: [ base_deps, deps ],
   install: true, include_directories: compfy_inc)
 
 if get_option('unittest')

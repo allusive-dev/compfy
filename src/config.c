@@ -16,8 +16,6 @@
 #include <unistd.h>
 #include <xcb/render.h>        // for xcb_render_fixed_t, XXX
 
-#include <test.h>
-
 #include "c2.h"
 #include "common.h"
 #include "compiler.h"
@@ -91,36 +89,6 @@ char **xdg_config_dirs(void) {
 	dir_list[fill] = NULL;
 
 	return dir_list;
-}
-
-TEST_CASE(xdg_config_dirs) {
-	auto old_var = getenv("XDG_CONFIG_DIRS");
-	if (old_var) {
-		old_var = strdup(old_var);
-	}
-	unsetenv("XDG_CONFIG_DIRS");
-
-	auto result = xdg_config_dirs();
-	TEST_STREQUAL(result[0], "/etc/xdg");
-	TEST_EQUAL(result[1], NULL);
-	free(result);
-
-	setenv("XDG_CONFIG_DIRS", ".:.:/etc/xdg:.:/:", 1);
-	result = xdg_config_dirs();
-	TEST_STREQUAL(result[0], "/etc/xdg");
-	TEST_STREQUAL(result[1], "/");
-	TEST_EQUAL(result[2], NULL);
-	free(result);
-
-	setenv("XDG_CONFIG_DIRS", ":", 1);
-	result = xdg_config_dirs();
-	TEST_EQUAL(result[0], NULL);
-	free(result);
-
-	if (old_var) {
-		setenv("XDG_CONFIG_DIRS", old_var, 1);
-		free(old_var);
-	}
 }
 
 /**

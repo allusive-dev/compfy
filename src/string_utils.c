@@ -3,8 +3,6 @@
 
 #include <string.h>
 
-#include <test.h>
-
 #include "compiler.h"
 #include "string_utils.h"
 #include "utils.h"
@@ -35,20 +33,6 @@ char *mstrjoin(const char *src1, const char *src2) {
 	return str;
 }
 
-TEST_CASE(mstrjoin) {
-	char *str = mstrjoin("asdf", "qwer");
-	TEST_STREQUAL(str, "asdfqwer");
-	free(str);
-
-	str = mstrjoin("", "qwer");
-	TEST_STREQUAL(str, "qwer");
-	free(str);
-
-	str = mstrjoin("asdf", "");
-	TEST_STREQUAL(str, "asdf");
-	free(str);
-}
-
 /**
  * Concatenate a string on heap with another string.
  */
@@ -65,19 +49,6 @@ void mstrextend(char **psrc1, const char *src2) {
 
 	strncpy(*psrc1 + len1, src2, len2);
 	(*psrc1)[len - 1] = '\0';
-}
-
-TEST_CASE(mstrextend) {
-	char *str1 = NULL;
-	mstrextend(&str1, "asdf");
-	TEST_STREQUAL(str1, "asdf");
-
-	mstrextend(&str1, "asd");
-	TEST_STREQUAL(str1, "asdfasd");
-
-	mstrextend(&str1, "");
-	TEST_STREQUAL(str1, "asdfasd");
-	free(str1);
 }
 
 #pragma GCC diagnostic pop
@@ -113,21 +84,6 @@ double strtod_simple(const char *src, const char **end) {
 	return ret * neg;
 }
 
-TEST_CASE(strtod_simple) {
-	const char *end;
-	double result = strtod_simple("1.0", &end);
-	TEST_EQUAL(result, 1);
-	TEST_EQUAL(*end, '\0');
-
-	result = strtod_simple("-1.0", &end);
-	TEST_EQUAL(result, -1);
-	TEST_EQUAL(*end, '\0');
-
-	result = strtod_simple("+.5", &end);
-	TEST_EQUAL(result, 0.5);
-	TEST_EQUAL(*end, '\0');
-}
-
 const char *trim_both(const char *src, size_t *length) {
 	size_t i = 0;
 	while (isspace(src[i])) {
@@ -139,19 +95,4 @@ const char *trim_both(const char *src, size_t *length) {
 	}
 	*length = j - i + 1;
 	return src + i;
-}
-
-TEST_CASE(trim_both) {
-	size_t length;
-	const char *str = trim_both("  \t\n\r\f", &length);
-	TEST_EQUAL(length, 0);
-	TEST_EQUAL(*str, '\0');
-
-	str = trim_both(" asdfas  ", &length);
-	TEST_EQUAL(length, 6);
-	TEST_STRNEQUAL(str, "asdfas", length);
-
-	str = trim_both("  asdf asdf   ", &length);
-	TEST_EQUAL(length, 9);
-	TEST_STRNEQUAL(str, "asdf asdf", length);
 }

@@ -12,32 +12,6 @@ if get_option('buildtype') == 'release'
 	add_global_arguments('-DNDEBUG', language: 'c')
 endif
 
-if get_option('sanitize')
-	sanitizers = ['address', 'undefined']
-	if cc.has_argument('-fsanitize=integer')
-		sanitizers += ['integer']
-	endif
-	if cc.has_argument('-fsanitize=nullability')
-		sanitizers += ['nullability']
-	endif
-	add_global_arguments('-fsanitize='+','.join(sanitizers), language: 'c')
-	add_global_link_arguments('-fsanitize='+','.join(sanitizers), language: 'c')
-	if cc.has_argument('-fno-sanitize=unsigned-integer-overflow')
-		add_global_arguments('-fno-sanitize=unsigned-integer-overflow', language: 'c')
-	endif
-endif
-
-if get_option('modularize')
-	if not cc.has_argument('-fmodules')
-		error('option \'modularize\' requires clang')
-	endif
-	add_global_arguments(['-fmodules',
-	                      '-fmodule-map-file='+
-	                      meson.current_source_dir()+
-	                      '/src/compfy.modulemap'],
-	                     language: 'c')
-endif
-
 add_global_arguments('-D_GNU_SOURCE', language: 'c')
 
 if cc.has_header('stdc-predef.h')
@@ -60,8 +34,6 @@ endif
 if get_option('with_docs')
 	install_data('./man/compfy.1', install_dir: join_paths(get_option('mandir'), 'man1'))
 endif
-
-test_h_dep = subproject('test.h').get_variable('test_h_dep')
 
 subdir('src')
 

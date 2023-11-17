@@ -21,7 +21,6 @@
 #include <xcb/xinerama.h>
 
 #include <ev.h>
-#include <test.h>
 
 #include "common.h"
 #include "compiler.h"

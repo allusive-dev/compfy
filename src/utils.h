@@ -12,8 +12,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <test.h>
-
 #include <time.h>
 
 #include "compiler.h"
