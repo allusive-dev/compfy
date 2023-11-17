@@ -74,7 +74,7 @@ Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## Installation
 
-Note if you want to enabled the `--check-for-update` option you will need to build with these commands instead.
+Note if you want to enabled the `--check-for-update` option (avaliable as of `1.7.0`) you will need to build with these commands instead.
 (`--check-for-update` will print out your current version and the latest release version number if you are connected to the internet)
 
 ### Building Manually
