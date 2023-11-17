@@ -74,11 +74,11 @@ Can't find what you need in the wiki or have an problem? Open an Issue.
 
 ## Installation
 
-Note if you want to enabled the `--check-for-update` option (avaliable as of `1.7.0`) you will need to build with these commands instead.
-(`--check-for-update` will print out your current version and the latest release version number if you are connected to the internet)
+Note if you want to enabled the `--check-for-updates` option (avaliable as of `1.7.0`) you will need to build with these commands instead.
+(`--check-for-updates` will print out your current version and the latest release version number if you are connected to the internet)
 
 ### Building Manually
-Without `--check-for-update`:
+Without `--check-for-updates`:
 ```
 $ meson setup . build
 $ ninja -C build
