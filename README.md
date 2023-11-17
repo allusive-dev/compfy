@@ -62,7 +62,7 @@ For those who don't know this is a compositor for Linux and the X11 platform. It
 
 Compfy provides all the features from `Picom` whilst implementing many more and also receiving frequent bugfixes as issues come up.
 
-This is currently the best actively maintained X11 Compositor adding proper animations and more features as requested by the community!
+This is currently the (debateably) best actively maintained X11 Compositor adding proper animations and more features as requested by the community!
 
 ## Documentation/Wiki.
 
