@@ -23,6 +23,12 @@ module region {
 module compfy {
   header "compfy.h"
 }
+module curl {
+  header "curl.h"
+}
+module json-c {
+  header "json.h"
+}
 module types {
   header "types.h"
 }

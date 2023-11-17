@@ -11,6 +11,8 @@ option('xrescheck', type: 'boolean', value: false, description: 'Enable X resour
 
 option('with_docs', type: 'boolean', value: true, description: 'Build documentation and man pages')
 
+option('update_checks', type: 'boolean', value: false, description: 'Gives access to --check-for-updates option')
+
 option('modularize', type: 'boolean', value: false, description: 'Build with clang\'s module system')
 
 option('unittest', type: 'boolean', value: false, description: 'Enable unittests in the code')

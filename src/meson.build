@@ -9,7 +9,7 @@ base_deps = [
 
 srcs = [ files('compfy.c', 'win.c', 'c2.c', 'x.c', 'config.c', 'vsync.c', 'utils.c',
                'diagnostic.c', 'string_utils.c', 'render.c', 'kernel.c', 'log.c',
-               'options.c', 'event.c', 'cache.c', 'atom.c', 'file_watch.c') ]
+               'options.c', 'event.c', 'cache.c', 'atom.c', 'file_watch.c', 'update.c') ]
 compfy_inc = include_directories('.')
 
 cflags = []
@@ -36,6 +36,11 @@ if not cc.has_header('uthash.h')
 endif
 
 deps = []
+
+if get_option('update_checks')
+	cflags += ['-DCONFIG_UPDATES']
+	deps += [dependency('json-c', required: true), dependency('libcurl', required: true)]
+endif
 
 if get_option('config_file')
 	deps += [dependency('libconfig', version: '>=1.4', required: true)]

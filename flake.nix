@@ -14,7 +14,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         nativeBuildInputs = with pkgs; [];
-        buildInputs = with pkgs; [ pcre2 ];
+        buildInputs = with pkgs; [ pcre2 json_c curl ];
       in {
         devShells.default = pkgs.mkShell {inherit nativeBuildInputs buildInputs;};
 

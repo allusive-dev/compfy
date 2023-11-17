@@ -191,6 +191,9 @@ static const struct compfy_option compfy_options[] = {
     {"active-opacity-exclude", required_argument, 817, NULL, "Exclude windows from being affected by active opacity"},
     {"inactive-exclude", required_argument, 818, NULL, "Exclude windows from being affected by inactive opacity"},
     {"blur-whitelist", no_argument, 819, NULL, "Toggles Blur Whitelisting"},
+#ifdef CONFIG_UPDATES 
+    {"check-for-updates", no_argument,'cfu', NULL, "Check for updates"},
+#endif
 };
 // clang-format on
 
@@ -336,8 +339,14 @@ bool get_early_config(int argc, char *const *argv, char **config_file, bool *all
 		} else if (o == 'h') {
 			usage(argv[0], 0);
 			return true;
-
-		} else if (o == 'b') {
+		} 
+#ifdef CONFIG_UPDATES 
+		else if (o == 'cfu') {
+			check_for_updates();
+			return true;
+		} 
+#endif
+		else if (o == 'b') {
 			*fork = true;
 		} else if (o == 314) {
 			*all_xerrors = true;
@@ -412,6 +421,11 @@ bool get_cfg(options_t *opt, int argc, char *const *argv, bool shadow_enable,
 			// so assert(false) here
 			assert(false);
 			break;
+#ifdef CONFIG_UPDATES 
+		case 'cfu':
+			assert(false);
+			break;
+#endif
 		case 'b':
 		case 314:
 		case 320:
