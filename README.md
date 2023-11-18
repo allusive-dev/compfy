@@ -24,7 +24,9 @@ Want to chat personally? Contact me here:
 [![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
 
 We just reached 100 stars as of 18th of November 2023 and I just wanted to say thank you so much everyone who has supported the project by submitting their issues and just being really friendly in general!
+
 Also a MASSIVE thank you to all those that have contributed via Pull Requests or by Sponsoring, it genuinley means so much to me that this project helps and reaches as many people as possible!
+
 With that said the new goal is 500 stars. How long do you think it will take?
 
 **If you are feelling really generous I now have GitHub sponsors setup so you can support my work more directly.
