@@ -1,86 +1,51 @@
 # Compfy
-See [What is This](https://github.com/allusive-dev/compfy#what-is-this)
 
-<br>
-<br>
+1. [Introduction](#introduction)
+2. [Getting Started](#getting-started)
+   - [Installation](#installation)
+   - [Configuration](#configuration)
+3. [Usage](#usage)
+4. [Contacts](#contacts)
+5. [Contributing](#contributing)
+6. [License](#license)
 
-# Update
+![Compfy Banner](media/compfy-banner.png)
 
-Now that Compfy has publically released I want to make a few things clear.
-- Compfy will continue to recieve updates based on `yshui/picom`'s stable releases.
-- Compfy is no longer considered a fork of Picom, it is its own compositor based upon Picom.
+## Introduction
 
+Compfy is a Compositor for the [X11](https://www.x.org/wiki/) platform on Linux. Compfy's main purpose is to pretty up your graphical desktop environment by letting users have features like transparency, background blurring, rounded corners, animations and way more!
 
-**There is now a live matrix chat room for Compfy/Picom-Allusive. Join us [here](https://matrix.to/#/#compfy-discussion:matrix.org)**
+Compfy was made as an alternative to [Picom](https://github.com/yshui/picom), another popular X11 compositor. Compfy is based on Picom but provides more features and active community support.
 
-<br>
-<br>
+**Before we begin I want to say I massive thank you to my sponsors as they make this work possible!**
 
-
-Want to chat personally? Contact me here:
-
-[![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
-[![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://github.com/allusive-dev/allusive-dev#contact-me)
-[![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
-
-We just reached 100 stars as of 18th of November 2023 and I just wanted to say thank you so much everyone who has supported the project by submitting their issues and just being really friendly in general!
-
-Also a MASSIVE thank you to all those that have contributed via Pull Requests or by Sponsoring, it genuinley means so much to me that this project helps and reaches as many people as possible!
-
-With that said the new goal is 500 stars. How long do you think it will take?
-
-**If you are feelling really generous I now have GitHub sponsors setup so you can support my work more directly.
-Even if you can only give a small amount it goes a long way!**
+*If you are interesting in supporting this work aswell you too can sponsor me on GitHub. Even the smallest amount is much appreciated and shows me that this project is still wanted!*
 
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/allusive-dev)
-
-### Sponsors
-Thank you to the following people who make this work possible!
 
 - [@SolninjaA](https://github.com/SolninjaA) ($5 One Time) (The First Ever Sponsor!)
 - [@maclightning2](https://github.com/maclightning2) ($3 A Month) (First Ever Monthly Sponsor)
 
-## Announcements
+## Getting Started
 
-Please check out the updated documentation.
+Let's cover how to install Compfy on your system and breifly go over how to configure it.
 
-Current Featueres:
+### Installation
 
-- Includes all fixes and changes from `yshui/picom-v10.2`
-- Includes pijulius animation code. (
+Compfy is avaliable on a few packaged platforms including on the AUR and very soon coming to [Nixpkgs](https://github.com/NixOS/nixpkgs)
 
-    **As of `1.2.0` `animation-for-workspace-in`, `animation-for-workspace-out`, `animation-for-transient-window` have been removed because their corrosponding functions caused the issue of the wrong animations playing in all other instances, Aswell as not working as intended**
-  
-  )
-- Includes corners-rule. Allowing you to set the corner-radius on a per window basis.
-- Animation open and unmap exclusion lists! Don't want something animating? Now you can fix that.
-- Blur rules. Background blurring can now be done on a whitelist basis to reduce hardware consumption.
-- Fixes rounded corner issues on AwesomeWM, bspwm and i3.
-- A New option, `wm-support` has been added. Applies patches for ("awesome", "dwm", "herb"). "herb" being HerbstluftWM.
-- Adds `inactive-exclude` and `active-exclude`. See Wiki or Donument for more information.
+| Linux Distribution | Method  | Compatibility |
+| ------------------ | ------- | --------------|
+| Arch Linux         | [AUR](https://aur.archlinux.org/packages/compfy) | :green_circle: |
+| NixOS (Stable)     | [Custom Package](https://github.com/allusive-dev/compfy/releases/latest) | :green_circle: |
+| NixOS (Unstable)   | Nixpkgs  | :orange_circle: |
+| Other              | [Manually Building](#manually) | :green_circle: |
 
-## What Is This?
+#### Manually
 
-For those who don't know this is a compositor for Linux and the X11 platform. It gives windows transparency, blur, animations and much more!
+*Note if you want to enabled the `--check-for-updates` option (avaliable as of `1.7.0`) you will need to build with these commands instead.
+(`--check-for-updates` will print out your current version and the latest release version number if you are connected to the internet)*
 
-Compfy provides all the features from `Picom` whilst implementing many more and also receiving frequent bugfixes as issues come up.
-
-This is currently the (debateably) best actively maintained X11 Compositor adding proper animations and more features as requested by the community!
-
-## Documentation/Wiki.
-
-The Wiki is also avaliable and actively updated on [Donument](https://donument.com/d/Allusive/compfy/-/documents/) an up and coming git versioned database allows for more than just code to be versioned.
-
-The GitHub Wiki is still actively maintained just incase, so don't worry about relying 100% on a external site yet if you don't feel comfortable with that. Thought I highly encourage taking a good look at Donument.
-
-Can't find what you need in the wiki or have an problem? Open an Issue.
-
-## Installation
-
-Note if you want to enabled the `--check-for-updates` option (avaliable as of `1.7.0`) you will need to build with these commands instead.
-(`--check-for-updates` will print out your current version and the latest release version number if you are connected to the internet)
-
-### Building Manually
 Without `--check-for-updates`:
 ```
 $ meson setup . build
@@ -120,20 +85,59 @@ ninja (make)
 'curl' or 'libcurl'
 ```
 
-### Arch Linux or other Arch based distros
+### Configuration
+
+Compfy stores its default configuration at `/etc/xdg/compfy.conf.example`(may vary depending on OS). 
+The default configuration provides almost all the options you will ever need, some commented out.
+
+It is reccomended you store your personal configuration at `~/.config/compfy.conf` or `~/.config/compfy/compfy.conf`
+*You can do this by copying over the sample configuration or simply writing your own.*
+
+For a VERY detailed guide on configurating Compfy please see the Documentation.
+It is avaliable in the Wiki tab above and on [Donument](https://donument.com/d/Allusive/compfy/-/documents/) an up and coming git versioned database allows for more than just code to be versioned.
+
+Or if you still use `man` the Documentation is also avaliable under `man compfy`.
+
+
+## Usage
+
+Compfy has very similar command line arguments to Picom.
+
+You can view all the commands and what they do with `compfy --help` but here is a few to get you started.
 
 ```
-$ paru -S compfy
-```
+$ compfy --version
+# Print the current version
+
+$ compfy --help
+# Print all the avaliable command line options with explanations
+
+$ compfy -b
 or
+$ compfy --daemon
+# Run Compfy in the background, dissociating it from the terminal.
 ```
-$ yay -S compfy
-```
 
-### NixOS
+## Contacts
 
-Compfy is not yet avaliable on unstable(23.11)
+For general discussion on Compfy there is a Matrix chat room! Join everyone [here](https://matrix.to/#/#compfy-discussion:matrix.org)!
 
-Coming soon though.
+For personal enquiries you can get in contact with me here:
 
-Thank you for your patience.
+[![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
+[![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://github.com/allusive-dev/allusive-dev#contact-me)
+[![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
+
+## Contributing
+
+Want to help contribute to Compfy? Here is a few ways you can contribute to the project:
+
+- Open an Issue about a Bug or Feature.
+- Open a Pull Request to fix a Bug or implement a Feature.
+- Sponsor the project on GitHub!
+
+If you are interested in supporting the project further and you have intermediate or higher knowledge with C and/or X11 please contact me and I'll see how you might be able to help out!
+
+## License
+
+Compfy is licensed under [MIT](LICENSES/MIT) and [MPL-2.0](LICENSES/MPL-2.0)
