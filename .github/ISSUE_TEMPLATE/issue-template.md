@@ -7,6 +7,8 @@ assignees: allusive-dev
 
 ---
 
+IF SOMETHING IS NOT WORKING. READ THE DOCUMENTATION BEFORE CREATING AN ISSUE!!!
+
 <-- Please fill in all the forms below that are relevant then delete this line -->
 
 **What is the issue**
