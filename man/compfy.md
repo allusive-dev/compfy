@@ -4,6 +4,37 @@
 
 #### Config can be placed at either `~/.config/compfy.conf` or `~/.config/compfy/compfy.conf`
 
+## Basic Syntax
+
+Variables are formatted like this
+
+```
+variable-name = value;
+```
+All values require a semi-colon on the end as shown above.
+
+When declaring a animation-name you need to use double quotes like such
+
+```
+animation-for-unmap-window = "slide-down";
+```
+
+When using rule-sets there are two ways to provide windows to it.
+
+With almost every rule-set it will follow this syntax and structure.
+
+```
+rule-set = [
+  "class_g = 'foo'" # Select windows by classname
+  "name = 'bar'" # Select windows by name
+];
+```
+
+In the example you replace `foo` with the `WM_CLASS` which can be found using the `xprop` command provided by [xorg-xprop](https://archlinux.org/packages/extra/x86_64/xorg-xprop/) on Arch and `xorg.xprop` on NixOS.
+
+Sometimes `xprop` will output multiple class names. If the first class name does not work, try the second one.
+
+
 # Options
 
 ## corner-radius
