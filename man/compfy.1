@@ -2,6 +2,59 @@
 .TH Compfy
 .SH Guide for Configuring Compfy
 .SS Config can be placed at either \fB\fC~/.config/compfy.conf\fR or \fB\fC~/.config/compfy/compfy.conf\fR
+.SH Basic Syntax
+.PP
+Variables are formatted like this
+
+.PP
+.RS
+
+.nf
+variable-name = value;
+
+.fi
+.RE
+
+.PP
+All values require a semi-colon on the end as shown above.
+
+.PP
+When declaring a animation-name you need to use double quotes like such
+
+.PP
+.RS
+
+.nf
+animation-for-unmap-window = "slide-down";
+
+.fi
+.RE
+
+.PP
+When using rule-sets there are two ways to provide windows to it.
+
+.PP
+With almost every rule-set it will follow this syntax and structure.
+
+.PP
+.RS
+
+.nf
+rule-set = [
+  "class_g = 'foo'" # Select windows by classname
+  "name = 'bar'" # Select windows by name
+];
+
+.fi
+.RE
+
+.PP
+In the example you replace \fB\fCfoo\fR with the \fB\fCWM_CLASS\fR which can be found using the \fB\fCxprop\fR command provided by xorg-xprop
+\[la]https://archlinux.org/packages/extra/x86_64/xorg-xprop/\[ra] on Arch and \fB\fCxorg.xprop\fR on NixOS.
+
+.PP
+Sometimes \fB\fCxprop\fR will output multiple class names. If the first class name does not work, try the second one.
+
 
 .SH Options
 .SH corner-radius
