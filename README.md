@@ -5,9 +5,7 @@
    - [Installation](#installation)
    - [Configuration](#configuration)
 3. [Usage](#usage)
-4. [Contacts](#contacts)
-5. [Contributing](#contributing)
-6. [License](#license)
+4. [License](#license)
 
 ![Compfy Banner](media/compfy-banner.png)
 
