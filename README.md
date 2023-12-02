@@ -38,7 +38,6 @@ Compfy is avaliable on a few packaged platforms including on the AUR and very so
 | ------------------ | ------- | --------------|
 | Arch Linux         | [AUR](https://aur.archlinux.org/packages/compfy) | :green_circle: |
 | NixOS (Stable)     | [Custom Package](https://github.com/allusive-dev/compfy/releases/latest) | :green_circle: |
-| NixOS (Unstable)   | Nixpkgs  | :orange_circle: |
 | Other              | [Manually Building](#manually) | :green_circle: |
 
 #### Manually
@@ -117,26 +116,6 @@ or
 $ compfy --daemon
 # Run Compfy in the background, dissociating it from the terminal.
 ```
-
-## Contacts
-
-For general discussion on Compfy there is a Matrix chat room! Join everyone [here](https://matrix.to/#/#compfy-discussion:matrix.org)!
-
-For personal enquiries you can get in contact with me here:
-
-[![Matrix](https://img.shields.io/badge/MATRIX-012121.svg?style=for-the-badge&logo=Matrix&logoColor=white)](https://matrix.to/#/@allusive_:matrix.org)
-[![Discord](https://img.shields.io/badge/DISCORD-5865F2.svg?style=for-the-badge&logo=Discord&logoColor=white)](https://discord.gg/4vaK3Wf3mM)
-[![Email](https://img.shields.io/badge/EMAIL-160F33.svg?style=for-the-badge&logo=ProtonMail&logoColor=white)](mailto:jasper@allusive.dev)
-
-## Contributing
-
-Want to help contribute to Compfy? Here is a few ways you can contribute to the project:
-
-- Open an Issue about a Bug or Feature.
-- Open a Pull Request to fix a Bug or implement a Feature.
-- Sponsor the project on GitHub!
-
-If you are interested in supporting the project further and you have intermediate or higher knowledge with C and/or X11 please contact me and I'll see how you might be able to help out!
 
 ## License
 
