@@ -750,7 +750,10 @@ void win_process_update_flags(session_t *ps, struct managed_win *w) {
 			w->g = w->pending_g;
 
 		// Update window geometry
-		} else if (ps->o.animations) {
+		} else if (ps->o.animations
+				&& ps->o.wintype_option[w->window_type].animation != 0
+				&& !c2_match(ps, w, ps->o.animation_open_blacklist, NULL)) {
+
 			if (!was_visible) {
 				// Set window-open animation
 				init_animation(ps, w);
