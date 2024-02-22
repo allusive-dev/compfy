@@ -36,7 +36,7 @@ Compfy was made as an alternative to [Picom](https://github.com/yshui/picom), an
 
 ## Getting Started
 
-Let's cover how to install Compfy on your system and breifly go over how to configure it.
+Let's cover how to install Compfy on your system and briefly go over how to configure it.
 
 ### Installation
 
