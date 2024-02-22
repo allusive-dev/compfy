@@ -10,7 +10,7 @@ Why?
 
 ### Update
 
-So i just tried to create a new repository just to let people know about my new GitHub account @jasper-at-windswept, but I can't create repositories because my account APPARENTLY still being deleted, so yeah if this repository just dissapears in like a month you now know why.
+So i just tried to create a new repository just to let people know about my new GitHub account [@jasper-at-windswept](https://github.com/jasper-at-windswept), but I can't create repositories because my account APPARENTLY still being deleted, so yeah if this repository just dissapears in like a month you now know why.
 
 ## TOC
 
