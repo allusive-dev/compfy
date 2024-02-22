@@ -1,5 +1,15 @@
 # Compfy
 
+## Notice
+
+Context: #61
+So for some reason my account wasn't deleted so I guess I'll just put it out there that this project is no longer being maintained!
+Why?
+1. See #61
+2. Picom is finally updating and adding animations support, BUT GUESS WHAT. They are not adding anything from Compfy. (sad)
+
+## TOC
+
 1. [Introduction](#introduction)
 2. [Getting Started](#getting-started)
    - [Installation](#installation)
