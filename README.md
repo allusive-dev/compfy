@@ -29,11 +29,7 @@ Compfy is a Compositor for the [X11](https://www.x.org/wiki/) platform on Linux.
 
 Compfy was made as an alternative to [Picom](https://github.com/yshui/picom), another popular X11 compositor. Compfy is based on Picom but provides more features and active community support.
 
-**Before we begin I want to say I massive thank you to my sponsors as they make this work possible!**
-
-*If you are interesting in supporting this work aswell you too can sponsor me on GitHub. Even the smallest amount is much appreciated and shows me that this project is still wanted!*
-
-[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/allusive-dev)
+**Before we begin I want to say I massive thank you to my sponsors as they made this work possible!**
 
 - [@SolninjaA](https://github.com/SolninjaA) ($5 One Time) (The First Ever Sponsor!)
 - [@maclightning2](https://github.com/maclightning2) ($3 A Month) (First Ever Monthly Sponsor)
@@ -48,9 +44,11 @@ Compfy is avaliable on a few packaged platforms including on the AUR and very so
 
 | Linux Distribution | Method  | Compatibility |
 | ------------------ | ------- | --------------|
-| Arch Linux         | [AUR](https://aur.archlinux.org/packages/compfy) | :green_circle: |
+| Arch Linux         | [AUR](https://aur.archlinux.org/packages/compfy) | :orange_circle: |
 | NixOS (Stable)     | [Custom Package](https://github.com/allusive-dev/compfy/releases/latest) | :green_circle: |
 | Other              | [Manually Building](#manually) | :green_circle: |
+
+*AUR package is not maintained by me anymore*
 
 #### Manually
 
